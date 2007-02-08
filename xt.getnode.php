@@ -23,7 +23,7 @@
  */
 class getNode{
 	public function __construct($xt){
-		$this->debug=1;
+		$this->debug=0;
 
 		$this->xml=$xt->xml;
 		$this->root=$xt->root;
@@ -128,11 +128,11 @@ class getNode{
 			$this->xpath.=$glue.'*';
 		}
 		
-		echo $str;
-		
 		preg_match_all('#\#[a-z0-9]+|\.[a-z0-9]+|\[[a-z0-9]+(?:[*~|^$]?="[a-z0-0]+")?\]|:[a-z-]+(?:\(.*?\))?#', $str, $match);
 		
-		print_r($match);
+		if($this->debug){
+			print_r($match);
+		}
 		
 		if(empty($match[0])){
 			// nothing ?
@@ -144,7 +144,9 @@ class getNode{
 	}
 	
 	private function addParam($param){
-		echo '<code>'.$param.'</code>';
+		if($this->debug){
+			echo '<code>'.$param.'</code>';
+		}
 		
 		if(substr($param, 0, 4)==':not'){
 			$not=true;
@@ -375,7 +377,9 @@ class getNode{
 			$xpath = new DOMXPath($this->xml);
 			$results = $xpath->query($this->xpath, $this->parent);
 			
-			echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';
+			if($this->debug){
+				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';
+			}
 			
 			return $results;
 		}
