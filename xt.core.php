@@ -43,7 +43,7 @@ class xt{
 	 * small tidy
 	 */
 	function tidy($str){
-		$tidy=new tidy();
+		$tidy=new small_tidy();
 		return $tidy->clean($str);
 	}
 	
@@ -143,7 +143,7 @@ class xt{
 	public function display($mime=0){
 		/************* xpath tests *****************
 		$xpath = new DOMXPath($this->xml);
-		$query = '//div[../*[position() mod 2=0]=.]';
+		$query = '//div[../*[3]=.]';
 		$objects = $xpath->query($query);
 		
 		echo '<ul>';
