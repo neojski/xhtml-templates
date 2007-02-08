@@ -130,7 +130,7 @@ class getNode{
 		
 		echo $str;
 		
-		preg_match_all('#\#[a-z0-9]+|\.[a-z0-9]+|\[[a-z0-9]+(?:="[a-z0-0]+")?\]|:[a-z-]+(?:\(.*?\))?#', $str, $match);
+		preg_match_all('#\#[a-z0-9]+|\.[a-z0-9]+|\[[a-z0-9]+(?:[*~|^$]?="[a-z0-0]+")?\]|:[a-z-]+(?:\(.*?\))?#', $str, $match);
 		
 		print_r($match);
 		
@@ -198,11 +198,12 @@ class getNode{
 	private function g_class($class, $not=false){
 		$class=substr($class, 1);
 		
-		if(!$not){
+		/*if(!$not){
 			$this->xpath.='[contains(concat(" ", @class, " "), " '.$class.' ")]';
 		}else{
 			$this->xpath.='[not(contains(concat(" ", @class, " "), " '.$class.' "))]';
-		}
+		}*/
+		$this->g_attribute('[class~="'.$class.'"]', $not);
 	}
 	
 	private function g_attribute($attribute, $not){
@@ -230,7 +231,7 @@ class getNode{
 					$match='contains(@'.$attribute.', "'.$value.'")';
 					break;
 				case '|':
-					$match='contains(@'.$attribute.', " '.$value.'-") or starts-with(@'.$attribute.', "'.$value.'-")';
+					$match='@'.$attribute.'="'.$value.'" or contains(@'.$attribute.', " '.$value.'-") or starts-with(@'.$attribute.', "'.$value.'-")';
 					break;
 			}
 		}else{
@@ -254,35 +255,35 @@ class getNode{
 		
 		switch($match){
 			case ':first-child':
-				$match.='../*[position()=1]=.';
+				$match='../*[1]=.';
 			break;
 			
 			case ':last-child':
-				$match.='../*[position()=last()]=.';
+				$match='../*[position()=last()]=.';
 			break;
 			
 			case ':first-of-type':
-				$match.='position()=1';
+				$match='position()=1';
 			break;
 			
 			case ':last-of-type':
-				$match.='position()=last()';
+				$match='position()=last()';
 			break;
 			
 			case ':only-of-type':
-				$match.='position()=1 and position()=last()';
+				$match='position()=1 and position()=last()';
 			break;
 			
 			case ':only-child':
-				$match.='../*[position()=1 and position()=last()]=.';
+				$match='../*[position()=1 and position()=last()]=.';
 			break;
 			
 			case ':root':
-				$match.='/=.';
+				$match='/=.';
 			break;
 			
 			case ':empty':
-				$match.='count(./child::node())=0';
+				$match='count(./child::node())=0';
 			break;
 			
 			case ':lang':
@@ -318,7 +319,7 @@ class getNode{
 				}elseif($a==-1){
 					$match='../*[position()<'.($b-1).']=.';
 				}elseif($a){
-					$match='../*[(position()+'.(-$b).')*'.$a.'>=0 and (position()+'.(-$b).') mod '.$a.'=0]=.';
+					$match='.=../*[(position()+'.(-$b).')*'.$a.'>=0 and (position()+'.(-$b).') mod '.$a.'=0]';
 				}else{
 					$match='../*[position()='.$b.']=.';
 				}
@@ -366,11 +367,6 @@ class getNode{
 			$this->xpath.='[not('.$match.')]';
 		}
 	}
-		
-		/*
-		:nth-child	
-			
-	}*/
 	
 	private function getobjects(){
 		if(empty($this->xpath)){
@@ -386,25 +382,26 @@ class getNode{
 	}
 	
 	private function getglue($glue){
-		$glue=trim($glue);
-		switch($glue){
-			case null:
-				$glue='/descendant-or-self::';
-				break;
-			case '':
-				$glue='//';
-				break;
-			case '>':
-				$glue='/';
-				break;
-			case '+':
-				$glue='/following::*[1]/self::';
-				break;
-			case '~':
-				$glue='/following::';
-				break;
+		if(is_null($glue)){
+			return '/descendant-or-self::';
+		}else{
+			$glue=trim($glue);
+			switch($glue){
+				case '':
+					$glue='/descendant::';
+					break;
+				case '>':
+					$glue='/';
+					break;
+				case '+':
+					$glue='/following::*[1]/self::';
+					break;
+				case '~':
+					$glue='/following::';
+					break;
+			}
+			return $glue;
 		}
-		return $glue;
 	}
 }
 
