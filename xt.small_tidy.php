@@ -23,7 +23,7 @@
 * only clean dirty html - unclosed tags, and so on
 * needs some improvements!
 */
-class tidy{
+class small_tidy{
 
 	private function is_open($str){
 		return preg_match('#<(?!(?:/|\?|!))[^>]+(?<!/)>#', $str);
