@@ -143,13 +143,14 @@ class xt{
 	public function display($mime=0){
 		/************* xpath tests *****************
 		$xpath = new DOMXPath($this->xml);
-		$query = '//div[../*[3]=.]';
+		$query = '//li/../li[position()=3]/self::li';
 		$objects = $xpath->query($query);
 		
-		echo '<ul>';
+		echo 'Obiekty<ul>';
 		foreach($objects as $object){
 			echo '<li><code>'.$object->nodeName.'</code>:<code>'.$object->nodeValue.'</code></li>';
 		}
+		echo '</ul>';
 		
 		/************* xpath tests *****************/
 		foreach($this->getElementsByClassName('remove_id') as $node){
