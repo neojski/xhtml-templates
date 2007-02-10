@@ -71,64 +71,39 @@ class getNode{
 	}
 	
 	private function add($str, $glue=0){
-		/*$unicode='[0-9a-f]{1,6}(?:\r\n|[ \n\r\t\f])?';
-		$nonascii='[^\0-\177]';
-		$escape=$unicode.'|[^\n\r\f0-9a-f]';
+		/*
+			zestaw skróconych wyrażeń
+		*/
+		$r_name='[_a-z0-9][_a-z]*';
+		$r_id='[_a-z0-9-]+';
+		$r_hash='\#'.$r_id;
+		$r_class='\.'.$r_name;
+		$r_attrib='\[\s*'.$r_name.'\s*(?:(?:\^=|\$r_=|\*=|=|~=|\|=)\s*(?:'.$r_name.')\s*)?\]';
 		
-		$nmchar='[_a-z0-9-]|'.$nonascii.'|'.$escape;
-		$nmstart='[_a-z]|'.$nonascii.'|'.$escape;
-		$ident='-?'.$nmstart.$nmchar.'*';
-		$string=$string1.'|'.$string2;
-		$string1='"(?:[^\n\r\f\\"]|\\'.$nl.'|'.$nonascii.'|'.$escape.')*"';
-		$string1='\'(?:[^\n\r\f\\\']|\\'.$nl.'|'.$nonascii.'|'.$escape.')*\'';
-		$function=$ident.'(?:';
-		$universal='\*';
-		$num='[0-9]+|[0-9]*\.[0-9]+';
-		$expression='(?:(?:\+|-|'.$num.$ident.'|'.$num.'|'.$string.'|'.$ident.')\s*)+';
-		$funcitonal_pseudo=$function.'\s*'.$expression.')';
+		$r_funcitonal_pseudo=$r_name.'\(.*?\)';
+		$r_pseudo=':(?:'.$r_id.'|'.$r_funcitonal_pseudo.')';
 		
-		$type_selector=$ident;
+		$r_negation_arg=$r_name.'|\*|'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo;
+		$r_negation=':not\(\s*'.$r_negation_arg.'\s*\)';
+		/*
+			koniec listy wyrażeń
+		*/
 		
-		$name=$nmchar.'+';
-		$hash='\#'.$name;
-		$class='\.'.$ident;
-		$attrib='\[\s*'.$ident.'\s*(?:(?:\^=|\$=|\*=|=|~=|\|=)\s*(?:'.$ident.'|'.$string.')\s*)?\]';
-		$pseudo=':(?:'.$ident.'|'.$funcitonal_pseudo.')';
-		
-		$negation_arg=$type_selector.'|'.$universal.'|'.$hash.'|'.$class.'|'.$attrib.'|'.$pseudo;
-		$negation=':not\(\s*'.$negation_arg.'\s*\)';
-		
-		echo '#('.$type_selector.'|'.$universal.')('.$hash.'|'.$class.'|'.$attrib.'|'.$pseudo.'|'.$negation.')*|('.$hash.'|'.$class.'|'.$attrib.'|'.$pseudo.'|'.$negation.')+#';
-		
-		preg_match_all('#(('.$type_selector.'|'.$universal.')('.$hash.'|'.$class.'|'.$attrib.'|'.$pseudo.'|'.$negation.')*|('.$hash.'|'.$class.'|'.$attrib.'|'.$pseudo.'|'.$negation.')+)#', $str, $match);
-		
-		print_r($match);
-		
-		
-		
-		preg_match_all('#(('.$type_selector.'|'.$universal.')('.$hash.'|'.$class.'|'.$attrib.'|'.$pseudo.'|'.$negation.')*|('.$hash.'|'.$class.'|'.$attrib.'|'.$pseudo.'|'.$negation.')+)#', $str, $match);
-		
-		print_r($match);*/
-		
-		$name='[a-z0-9]+';
-		
-		$glue=$this->getglue($glue);
-		
-		if(preg_match('#^'.$name.'#', $str, $match)){
+		if(preg_match('#^'.$r_name.'#', $str, $match)){
 			// tak, mamy nazwę
 			$name=$match[0];
-			
-			$this->xpath.=$glue.$name;
 			
 			$str=substr($str, strlen($name));
 			
 		}else{
 			// nie, nie podano nazwy
-			
-			$this->xpath.=$glue.'*';
+			$name='*';
 		}
 		
-		preg_match_all('#\#[a-z0-9]+|\.[a-z0-9]+|\[[a-z0-9]+(?:[*~|^$]?="[a-z0-0]+")?\]|:[a-z-]+(?:\(.*?\))?#', $str, $match);
+		if(!preg_match('#^(?:'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.'|'.$r_negation.')*$#', $str)){
+			die('niepoprawny format');
+		}
+		preg_match_all('#('.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.'|'.$r_negation.')#', $str, $match);
 		
 		if($this->debug){
 			print_r($match);
@@ -141,6 +116,32 @@ class getNode{
 				$this->addParam($param);
 			}
 		}
+		
+		$glue=$this->getglue($glue);
+		$this->xpath.=$glue.$name;
+		
+		if(!empty($this->child)){
+			$this->xpath.='/../*['.implode(' and ', $this->child).']/self::'.$name;
+		}
+		
+		if(!empty($this->type)){
+			$this->xpath.='['.implode(' and ', $this->type).']';
+		}
+		
+		unset($this->child, $this->type);
+		/*
+			jeśli $this->child
+			
+			$glue $name /../*[ $this->child ] /self:: name[ $this->type ]	
+			
+			jeśli nie
+			
+			$glue $name [ $this->type ]
+			
+			else
+			
+			$glue $name
+		*/
 	}
 	
 	private function addParam($param){
@@ -191,9 +192,9 @@ class getNode{
 		$id=substr($id, 1);
 		
 		if(!$not){
-			$this->xpath.='[@id="'.$id.'"]';
+			$this->type[]='@id="'.$id.'"';
 		}else{
-			$this->xpath.='[@id!="'.$id.'"]';
+			$this->type[]='@id!="'.$id.'"';
 		}
 	}
 	
@@ -241,9 +242,9 @@ class getNode{
 		}
 		
 		if(!$not){
-			$this->xpath.='['.$match.']';
+			$this->type[]=$match;
 		}else{
-			$this->xpath.='[not('.$match.')]';
+			$this->type[]='not('.$match.')';
 		}
 	}
 	
@@ -267,35 +268,35 @@ class getNode{
 		
 		switch($match){
 			case ':first-child':
-				$match='../*[1]=.';
+				$child='position()=1';
 			break;
 			
 			case ':last-child':
-				$match='../*[position()=last()]=.';
+				$child='position()=last()';
 			break;
 			
 			case ':first-of-type':
-				$match='position()=1';
+				$type='position()=1';
 			break;
 			
 			case ':last-of-type':
-				$match='position()=last()';
+				$type='position()=last()';
 			break;
 			
 			case ':only-of-type':
-				$match='position()=1 and position()=last()';
+				$type='position()=1 and position()=last()';
 			break;
 			
 			case ':only-child':
-				$match='../*[position()=1 and position()=last()]=.';
+				$child='position()=1 and position()=last()';
 			break;
 			
 			case ':root':
-				$match='/=.';
+				$type='/=.';
 			break;
 			
 			case ':empty':
-				$match='count(./child::node())=0';
+				$type='count(./child::node())=0';
 			break;
 			
 			case ':lang':
@@ -303,6 +304,12 @@ class getNode{
 			break;
 			
 			case ':nth-child':
+			case ':nth-last-child':
+				if(strpos($match, 'last')!==false){
+					$position='(last()-position())';
+				}else{
+					$position='position()';
+				}
 				/* nth-child start */
 				
 				if(preg_match('#(-?(\d+)?)n#', $param, $a)){
@@ -325,18 +332,24 @@ class getNode{
 				}
 				
 				if($a==1){
-					$match='../*[position()>'.($b-1).']=.';
+					$child=$position.'>'.($b-1);
 				}elseif($a==-1){
-					$match='../*[position()<'.($b-1).']=.';
+					$child=$position.'<'.($b-1);
 				}elseif($a){
-					$match='.=../*[(position()+'.(-$b).')*'.$a.'>=0 and (position()+'.(-$b).') mod '.$a.'=0]';
+					$child='('.$position.'+'.(-$b).')*'.$a.'>=0 and ('.$position.'+'.(-$b).') mod '.$a.'=0';
 				}else{
-					$match='../*[position()='.$b.']=.';
+					$child=$position.'='.$b;
 				}
 				/* nth-child end */
 			break;
 			
 			case ':nth-of-type':
+			case ':nth-last-of-type':
+				if(strpos($match, 'last')!==false){
+					$position='(last()-position())';
+				}else{
+					$position='position()';
+				}
 				/* nth-of-type start */
 				
 				if(preg_match('#(-?(\d+)?)n#', $param, $a)){
@@ -359,22 +372,31 @@ class getNode{
 				}
 				
 				if($a==1){
-					$match='position()>'.($b-1);
+					$type=$position.'>'.($b-1);
 				}elseif($a==-1){
-					$match='position()<'.($b-1);
+					$type=$position.'<'.($b-1);
 				}elseif($a){
-					$match='(position()+'.(-$b).')*'.$a.'>=0 and (position()+'.(-$b).') mod '.$a.'=0';
+					$type='('.$position.'+'.(-$b).')*'.$a.'>=0 and ('.$position.'+'.(-$b).') mod '.$a.'=0';
 				}else{
-					$match='position()='.$b;
+					$type=$position.'='.$b;
 				}
 				/* nth-of-type end */
 			break;
 		}
 		
-		if(!$not){
-			$this->xpath.='['.$match.']';
-		}else{
-			$this->xpath.='[not('.$match.')]';
+		if($type){
+			if(!$not){
+				$this->type[]=$type;
+			}else{
+				$this->type[]='not('.$type.')';
+			}
+		}
+		if($child){
+			if(!$not){
+				$this->child[]=$child;
+			}else{
+				$this->child[]='not('.$child.')';
+			}
 		}
 	}
 	
@@ -386,7 +408,7 @@ class getNode{
 			
 			$results = $xpath->query($this->xpath, $this->parent);
 			
-			if($this->debug){
+			if($this->debug||1){
 				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';
 			}
 			
