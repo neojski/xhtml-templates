@@ -524,7 +524,16 @@ class xt{
 	 */
 	public function insertAfter($new,  $old){
 		if($old=$this->getOneNode($old)){
-			$this->insertBefore($new, $old->nextSibling);
+			if(!$this->is_node($new)){
+				$new=$this->text2html($new);
+			}
+			// jeśli jest ktoś za
+			if($this->is_node(nextSibling)){
+				$this->insertBefore($new, $old->nextSibling);
+			}else{
+			// jeśl nie ma nikogo za ;-)
+				$old->parentNode->appendChild($new);
+			}
 		}
 	}
 	

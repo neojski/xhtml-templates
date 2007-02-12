@@ -74,17 +74,16 @@ class getNode{
 		/*
 			zestaw skróconych wyrażeń
 		*/
-		$r_name='[_a-z0-9][_a-z]*';
+		$r_name='[_a-z0-9][_a-z0-9]*';
 		$r_id='[_a-z0-9-]+';
 		$r_hash='\#'.$r_id;
 		$r_class='\.'.$r_name;
-		$r_attrib='\[\s*'.$r_name.'\s*(?:(?:\^=|\$r_=|\*=|=|~=|\|=)\s*(?:'.$r_name.')\s*)?\]';
+		$r_attrib='\[\s*'.$r_name.'\s*(?:(?:\^=|\$=|\*=|=|~=|\|=)\s*"'.$r_name.'"\s*)?\]';
 		
 		$r_funcitonal_pseudo=$r_name.'\(.*?\)';
 		$r_pseudo=':(?:'.$r_id.'|'.$r_funcitonal_pseudo.')';
-		
-		$r_negation_arg=$r_name.'|\*|'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo;
-		$r_negation=':not\(\s*'.$r_negation_arg.'\s*\)';
+
+		$r_negation=':not\(\s*(?:'.$r_name.'|\*|'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.')\s*\)';
 		/*
 			koniec listy wyrażeń
 		*/
@@ -101,9 +100,9 @@ class getNode{
 		}
 		
 		if(!preg_match('#^(?:'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.'|'.$r_negation.')*$#', $str)){
-			die('niepoprawny format');
+			die('niepoprawny format <code>'.$str.'</code>');
 		}
-		preg_match_all('#('.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.'|'.$r_negation.')#', $str, $match);
+		preg_match_all('#('.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_negation.'|'.$r_pseudo.')#', $str, $match);
 		
 		if($this->debug){
 			print_r($match);
@@ -146,7 +145,7 @@ class getNode{
 	
 	private function addParam($param){
 		if($this->debug){
-			echo '<code>'.$param.'</code>';
+			echo '<code>'.$param.'</code><br>';
 		}
 		
 		if(substr($param, 0, 4)==':not'){
@@ -180,7 +179,7 @@ class getNode{
 			default:
 				//nic z tych rzeczy, zatem po nazwie + not
 				if($not){
-					$this->xpath.='[name()!="'.$param.'"]';
+					$this->type[]='name()!="'.$param.'"';
 				}else{
 					//nigdy nie powinno się zdarzyć
 				}
@@ -408,7 +407,7 @@ class getNode{
 			
 			$results = $xpath->query($this->xpath, $this->parent);
 			
-			if($this->debug||1){
+			if($this->debug){
 				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';
 			}
 			
