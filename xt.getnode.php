@@ -74,14 +74,13 @@ class getNode{
 		/*
 			zestaw skróconych wyrażeń
 		*/
-		$r_name='[_a-z0-9][_a-z0-9]*';
+		$r_name='[_a-z0-9]+';
 		$r_id='[_a-z0-9-]+';
 		$r_hash='\#'.$r_id;
 		$r_class='\.'.$r_name;
-		$r_attrib='\[\s*'.$r_name.'\s*(?:(?:\^=|\$=|\*=|=|~=|\|=)\s*"'.$r_name.'"\s*)?\]';
+		$r_attrib='\[\s*'.$r_name.'\s*(?:(?:\^=|\$=|\*=|=|~=|\|=)\s*"[^"]+"\s*)?\]';
 		
-		$r_funcitonal_pseudo=$r_name.'\(.*?\)';
-		$r_pseudo=':(?:'.$r_id.'|'.$r_funcitonal_pseudo.')';
+		$r_pseudo=':'.$r_id.'(?:\(.*?\))?';
 
 		$r_negation=':not\(\s*(?:'.$r_name.'|\*|'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.')\s*\)';
 		/*
@@ -208,7 +207,7 @@ class getNode{
 	}
 	
 	private function g_attribute($attribute, $not){
-		preg_match('#\[([a-z0-9]+)(?:([~^$*|]?)="([a-z0-9]+)"\])?#', $attribute, $match);
+		preg_match('#\[(.*?)(?:([~^$*|]?)="([^"]+)")?\]#', $attribute, $match);
 		
 		$attribute=$match[1];
 		$separator=$match[2];
@@ -223,7 +222,7 @@ class getNode{
 					$match='contains(concat(" ", @'.$attribute.', " "), " '.$value.' ")';
 					break;
 				case '^':
-					$match='starts-with(@'.$attribute.', '.$value.')';
+					$match='starts-with(@'.$attribute.', "'.$value.'")';
 					break;
 				case '$':
 					$match='substring(@'.$attribute.', string-length(@'.$attribute.')-'.strlen($value).')="'.$value.'"';
