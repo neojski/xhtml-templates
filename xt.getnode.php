@@ -200,12 +200,11 @@ class getNode{
 	private function g_class($class, $not=false){
 		$class=substr($class, 1);
 		
-		/*if(!$not){
+		if(!$not){
 			$this->xpath.='[contains(concat(" ", @class, " "), " '.$class.' ")]';
 		}else{
 			$this->xpath.='[not(contains(concat(" ", @class, " "), " '.$class.' "))]';
-		}*/
-		$this->g_attribute('[class~="'.$class.'"]', $not); //nonsens, wydzielić nową funkcję?
+		}
 	}
 	
 	private function g_attribute($attribute, $not){
@@ -255,16 +254,6 @@ class getNode{
 		$param=$match[2];
 		$match=$match[1];
 		
-		/*
-			xpath specification says
-			
-			(http://www.w3.org/TR/xpath#booleans)
-			
-			If both objects to be compared are node-sets, then the comparison will be true if and only if there is a node in the first node-set and a node in the second node-set such that the result of performing the comparison on the string-values of the two nodes is true. If one object to be compared is a node-set and the other is a number, then the comparison will be true if and only if there is a node in the node-set such that the result of performing the comparison on the number to be compared and on the result of converting the string-value of that node to a number using the number function is true. If one object to be compared is a node-set and the other is a string, then the comparison will be true if and only if there is a node in the node-set such that the result of performing the comparison on the string-value of the node and the other string is true. If one object to be compared is a node-set and the other is a boolean, then the comparison will be true if and only if the result of performing the comparison on the boolean and on the result of converting the node-set to a boolean using the boolean function is true.
-			
-			
-		*/
-		
 		switch($match){
 			case ':first-child':
 				$child='position()=1';
@@ -299,7 +288,7 @@ class getNode{
 			break;
 			
 			case ':lang':
-				$this->g_attribute('[lang|="'.$param.'"]', $not);
+				$type='(@lang="'.$param.'" or contains(@lang, " '.$param.'-") or starts-with(@lang, "'.$param.'-"))';
 			break;
 			
 			case ':nth-child':

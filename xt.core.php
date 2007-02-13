@@ -507,7 +507,7 @@ class xt{
 	 * TODO:
 	 *  obsługa pętli - wykorzystywanie funkcji add
 	 */
-	public function insertBefore($new, $old){
+	public function insertBefore($old, $new){
 		if($old=$this->getOneNode($old)){
 			if($this->is_node($new) && $this->is_node($old)){
 				$old->parentNode->insertBefore($new, $old);
@@ -522,7 +522,7 @@ class xt{
 	 * dodać sprawdzanie
 	 * && $this->is_node($old->nextSibling)
 	 */
-	public function insertAfter($new,  $old){
+	public function insertAfter($old, $new){
 		if($old=$this->getOneNode($old)){
 			if(!$this->is_node($new)){
 				$new=$this->text2html($new);
