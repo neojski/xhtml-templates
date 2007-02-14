@@ -87,7 +87,7 @@ class getNode{
 			koniec listy wyrażeń
 		*/
 		
-		if(preg_match('#^'.$r_name.'#', $str, $match)){
+		if(preg_match('#^'.$r_name.'|\*#', $str, $match)){
 			// tak, mamy nazwę
 			$name=$match[0];
 			

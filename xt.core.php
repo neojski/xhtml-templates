@@ -383,7 +383,7 @@ class xt{
 	public function add($name, $value){
 		if($node=$this->getOneNode($name)){
 			if(is_array($value) && is_array($value[0])){
-				$node->removeAttribute('id');
+				//$node->removeAttribute('id');
 				$this->r($node, $value);
 			}elseif(is_array($value)){
 				$this->set($node, $value);
@@ -431,13 +431,12 @@ class xt{
 			$str=$this->xml->savexml($node);
 			$count=(int)$count;
 			if($count>0){
-				
 				for($i=0; $i<$count; $i++){
 					$fragment=$this->fragment($str);
 					
 					$node->parentNode->insertBefore($fragment->s, $node);
 					
-					$fragment->root=$node; //nieodpowiedniego rodzica ma fragment
+					$fragment->root=$node->previousSibling; //konieczne jest ustawienie rodzica, gdyż w tym miejscu tracimy #document-fragment
 
 					$return[]=$fragment;
 				}
@@ -524,15 +523,19 @@ class xt{
 	 */
 	public function insertAfter($old, $new){
 		if($old=$this->getOneNode($old)){
-			if(!$this->is_node($new)){
-				$new=$this->text2html($new);
-			}
+			//if(!$this->is_node($new)){
+			//	$new=$this->text2html($new);
+			//}
+			
+			$fragment=$this->xml->createDocumentFragment();
+			$this->add($fragment, $new); # some problems with loop
+			
 			// jeśli jest ktoś za
 			if($this->is_node(nextSibling)){
-				$this->insertBefore($new, $old->nextSibling);
+				$this->insertBefore($fragment, $old->nextSibling);
 			}else{
 			// jeśl nie ma nikogo za ;-)
-				$old->parentNode->appendChild($new);
+				$old->parentNode->appendChild($fragment);
 			}
 		}
 	}
