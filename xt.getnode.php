@@ -292,44 +292,6 @@ class getNode{
 			
 			case ':nth-child':
 			case ':nth-last-child':
-				if(strpos($match, 'last')!==false){
-					$position='(last()-position())';
-				}else{
-					$position='position()';
-				}
-				/* nth-child start */
-				
-				if(preg_match('#(-?(\d+)?)n#', $param, $a)){
-					if(empty($a[1])){
-						$a=1;
-					}elseif(empty($a[2])){
-						$a=-1;
-					}else{
-						$a=(int)$a[1];
-					}
-				}else{
-					$a=null;
-				}
-				
-				preg_match('#(-?\d+)(?!n)#', $param, $b);
-				if(empty($b[1])){
-					$b=0;
-				}else{
-					$b=(int)$b[1];
-				}
-				
-				if($a==1){
-					$child=$position.'>'.($b-1);
-				}elseif($a==-1){
-					$child=$position.'<'.($b-1);
-				}elseif($a){
-					$child='('.$position.'+'.(-$b).')*'.$a.'>=0 and ('.$position.'+'.(-$b).') mod '.$a.'=0';
-				}else{
-					$child=$position.'='.$b;
-				}
-				/* nth-child end */
-			break;
-			
 			case ':nth-of-type':
 			case ':nth-last-of-type':
 				if(strpos($match, 'last')!==false){
@@ -337,7 +299,12 @@ class getNode{
 				}else{
 					$position='position()';
 				}
-				/* nth-of-type start */
+				
+				if(strpos($match, 'child')!==false){
+					$nazwa='child';
+				}else{
+					$nazwa='type';
+				}
 				
 				if(preg_match('#(-?(\d+)?)n#', $param, $a)){
 					if(empty($a[1])){
@@ -358,16 +325,16 @@ class getNode{
 					$b=(int)$b[1];
 				}
 				
+				
 				if($a==1){
-					$type=$position.'>'.($b-1);
+					$$nazwa=$position.'>'.($b-1);
 				}elseif($a==-1){
-					$type=$position.'<'.($b-1);
+					$$nazwa=$position.'<'.($b-1);
 				}elseif($a){
-					$type='('.$position.'+'.(-$b).')*'.$a.'>=0 and ('.$position.'+'.(-$b).') mod '.$a.'=0';
+					$$nazwa='('.$position.'+'.(-$b).')*'.$a.'>=0 and ('.$position.'+'.(-$b).') mod '.$a.'=0';
 				}else{
-					$type=$position.'='.$b;
+					$$nazwa=$position.'='.$b;
 				}
-				/* nth-of-type end */
 			break;
 		}
 		
