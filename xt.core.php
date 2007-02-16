@@ -426,7 +426,7 @@ class xt{
 	 * nie działa jak należy
 	 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 	 */
-	public function loop($name, $count){
+	public function loop($name, $count, $delete_sample=true){
 		if($node=$this->getOneNode($name)){
 			$str=$this->xml->savexml($node);
 			$count=(int)$count;
@@ -439,6 +439,9 @@ class xt{
 					$fragment->root=$node->previousSibling; //konieczne jest ustawienie rodzica, gdyż w tym miejscu tracimy #document-fragment
 
 					$return[]=$fragment;
+				}
+				if($delete_sample){
+					$this->remove($node); // usuń wzorcowy element
 				}
 				return $return;
 			}else{
