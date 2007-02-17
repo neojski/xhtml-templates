@@ -304,11 +304,7 @@ class getNode{
 					$position='position()';
 				}
 				
-				if(strpos($match, 'child')!==false){
-					$nazwa='child';
-				}else{
-					$nazwa='type';
-				}
+				
 				
 				if(preg_match('#(-?(\d+)?)n#', $param, $a)){
 					if(empty($a[1])){

@@ -35,8 +35,12 @@ class xt{
 		}
 		$this->debug=false;
 		$this->getnode_method=2;
-		define('GETNODE_METHOD_XPATH', 1);
-		define('GETNODE_METHOD_CSS',2);
+		if(!defined('GETNODE_METHOD_XPATH')){
+			define('GETNODE_METHOD_XPATH', 1);
+		}
+		if(!defined('GETNODE_METHOD_CSS')){
+			define('GETNODE_METHOD_CSS',2);
+		}
 	}
 	
 	/**
@@ -81,8 +85,8 @@ class xt{
 		$this->template = $this->tidy($this->template);
 		
 		$this->template=str_replace(array('<![CDATA[', ']]>'), '', $this->template); //remove CDATAs
-		$this->template=preg_replace('#^(.*?)//\s*$#m', '\1', $this->template);  //delete empty inline comments
-		$this->template=preg_replace('#/\*\s*\*/#s', '', $this->template); //delete empty multiline comments
+		//$this->template=preg_replace('#^(.*?)//\s*$#m', '\1', $this->template);  //delete empty inline comments
+		//$this->template=preg_replace('#/\*\s*\*/#s', '', $this->template); //delete empty multiline comments
 		
 		$this->xml=new DOMDocument();
 		

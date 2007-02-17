@@ -52,7 +52,7 @@ class small_tidy{
 				if(in_array($this->get_node($node), $jednotagowe)){
 					$end.='<'.substr($node, 1, -1).' />';
 				}else{
-					if(in_array($this->get_node($node), $nie_zagniezdzane) && $open[count($open)-1]==$this->get_node($node)){
+					if(in_array($this->get_node($node), $nie_zagniezdzane) && count($open)>1 && $open[count($open)-1]==$this->get_node($node)){
 						$end.= '</'.$this->get_node($node).'>';
 						array_pop($open);
 					}
