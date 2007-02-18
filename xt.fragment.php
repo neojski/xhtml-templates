@@ -26,7 +26,7 @@ class fragment extends xt{
 		}
 		parent::__construct();
 	}
-	public function load($file){
+	public function load($file, $is_string=0){
 		if(is_file($file)){
 			if(file_exists($file)){
 				$this->template=file_get_contents($file);

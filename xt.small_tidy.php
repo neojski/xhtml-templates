@@ -22,6 +22,8 @@
 * it's not real tidy
 * only clean dirty html - unclosed tags, and so on
 * needs some improvements!
+*
+* Could someone import some good code from tidy written in c?
 */
 class small_tidy{
 
@@ -52,7 +54,7 @@ class small_tidy{
 				if(in_array($this->get_node($node), $jednotagowe)){
 					$end.='<'.substr($node, 1, -1).' />';
 				}else{
-					if(in_array($this->get_node($node), $nie_zagniezdzane) && count($open)>1 && $open[count($open)-1]==$this->get_node($node)){
+					if(in_array($this->get_node($node), $nie_zagniezdzane) && isset($open[count($open)-1]) && $open[count($open)-1]==$this->get_node($node)){
 						$end.= '</'.$this->get_node($node).'>';
 						array_pop($open);
 					}
@@ -65,7 +67,7 @@ class small_tidy{
 				
 			}elseif($this->is_close($node)){
 			
-				if($this->get_node($node)==$open[count($open)-1]){
+				if(isset($open[count($open)-1]) && $this->get_node($node)==$open[count($open)-1]){
 					$end.= $node;
 					array_pop($open);
 				}elseif(count($open)>0){
