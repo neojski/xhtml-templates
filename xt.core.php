@@ -71,7 +71,7 @@ class xt{
 	/**
 	 * @param str filename/template
 	 */
-	protected function load($file, $is_string=0){
+	public function load($file, $is_string=0){
 		if(!$is_string){
 			if(file_exists($file)){
 				$this->template=file_get_contents($file);
