@@ -548,6 +548,16 @@ class xt{
 	}
 	
 	/**
+	 * clone - return new fragment
+	 */
+	public function clone($node, $remove_parent=0){
+		if($node=$this->getOneNode($node)){
+			$fragment=$this->fragment($this->savexml($node));
+			return $fragment;
+		}
+	}
+	
+	/**
 	 * funkcje dodatkowe, htmlowe
 	 */
 	public function link($url, $rel, $title=false, $type=false, $media=false){
