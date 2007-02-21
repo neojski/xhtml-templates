@@ -550,7 +550,7 @@ class xt{
 	/**
 	 * clone - return new fragment
 	 */
-	public function clone($node, $remove_parent=0){
+	public function clone_node($node, $remove_parent=0){
 		if($node=$this->getOneNode($node)){
 			$fragment=$this->fragment($this->savexml($node));
 			return $fragment;
