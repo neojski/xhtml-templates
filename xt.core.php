@@ -100,7 +100,7 @@ class xt{
 			<meta http-equiv="content-type" content="text/html;charset=iso-8859-2" />
 		*/
 		
-		if(preg_match('#<\?xml[^>]+encoding="[^"]+"[^>]*?>#', $this->template, $encoding)){
+		if(preg_match('#<\?xml[^>]+encoding="([^"]+)"[^>]*?>#', $this->template, $encoding)){
 			$this->encoding=$encoding[1];
 		}elseif(preg_match('#<meta[^>]+content="[^=]+=(.*?)"[^>]*>#s', $this->template, $encoding)){
 			$this->template='<?xml version="1.0" encoding="'.$encoding[1].'"?>'.$this->template;
