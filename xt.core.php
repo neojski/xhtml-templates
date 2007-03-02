@@ -1,8 +1,9 @@
 <?php
 /*
  *	xt templates system
- *	Copyright :(C) 2007 Tomasz Kołodziejski
+ *	Copyright :(C) 2007 Tomasz 'neo' Kołodziejski <tkolodziejski at gmail dot com>, <neo007 at jabber dot com>
  *	E-mail    :tkolodziejski@gmail.com
+ *	Website   :http://neo.mlodzi.pl/xt
  *
  *	This library is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
@@ -18,17 +19,10 @@
  *	License along with this library; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-/**
- * xt - xhtml templates
- * author: neo
- * @link http://neo.mlodzi.pl/xt
- * @copyright 2007 Tomasz 'neo' Kołodziejski
- * @author Tomasz 'neo' Kołodziejski <tkolodziejski at gmail dot com>, <neo007 at jabber dot com>
- * @package xt
- * @version beta
- */
 class xt{
 	public function __construct($file=0, $is_string=0){
+		$this->find_plugins();
+		
 		$this->start_time=$this->microtime_float();
 		if($file){
 			$this->load($file, $is_string);
@@ -43,12 +37,34 @@ class xt{
 		}
 	}
 	
+	private function find_plugins(){
+		$this->plugins=array();
+		foreach(glob(dirname(__FILE__).'/*.php') as $file){
+			$file=substr(basename($file, '.php'), 3);
+			if($file!='class'){
+				$this->plugins[]=$file;
+			}
+		}
+	}
+	
+	/**
+	 * include plugins
+	 */
+	public function __get($name){
+		if(in_array($name, $this->plugins)){
+			if(!isset($this->$name)){
+				require_once('xt.'.$name.'.php');
+				$this->$name=new $name($this);
+			}
+		}
+		return $this->$name;
+	}
+	
 	/**
 	 * small tidy
 	 */
 	function tidy($str){
-		$tidy=new small_tidy();
-		return $tidy->clean($str);
+		return $this->small_tidy->clean($str);
 	}
 	
 	/**
@@ -309,7 +325,7 @@ class xt{
 		if($this->is_node($name)){
 			return $name;
 		}else{
-			$str=new getnode($this);
+			$str=$this->getnode;
 			if(!$parent){
 				$parent=$this->root;
 			}
@@ -621,7 +637,9 @@ class xt{
 	 * @param str template_fragment
 	 */
 	public function fragment($str=0){
-		return new fragment($str, $this->xml);
+		$fragment=$this->fragment;
+		$fragment->load($str, $this->xml);
+		return $fragment;
 	}
 	
 	/**

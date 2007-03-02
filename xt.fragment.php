@@ -19,11 +19,8 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 class fragment extends xt{
-	public function __construct($file=0, $xml){
-		$this->parent=$xml;
-		if($file){
-			$this->load($file);
-		}
+	public function __construct(&$xt){
+		$this->parent=$xt->xml;
 		parent::__construct();
 	}
 	public function load($file, $is_string=0){

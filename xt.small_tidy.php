@@ -1,8 +1,9 @@
 <?php
 /*
  *	xt templates system
- *	Copyright :(C) 2007 Tomasz Kołodziejski
+ *	Copyright :(C) 2007 Tomasz 'neo' Kołodziejski <tkolodziejski at gmail dot com>, <neo007 at jabber dot com>
  *	E-mail    :tkolodziejski@gmail.com
+ *	Website   :http://neo.mlodzi.pl/xt
  *
  *	This library is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public

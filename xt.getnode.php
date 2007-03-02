@@ -1,8 +1,9 @@
 <?php
 /*
  *	xt templates system
- *	Copyright :(C) 2007 Tomasz Kołodziejski
+ *	Copyright :(C) 2007 Tomasz 'neo' Kołodziejski <tkolodziejski at gmail dot com>, <neo007 at jabber dot com>
  *	E-mail    :tkolodziejski@gmail.com
+ *	Website   :http://neo.mlodzi.pl/xt
  *	
  *	CSS3 to XPATH1.0 translator
  *	This is a part of xt library.
@@ -22,7 +23,7 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 class getNode{
-	public function __construct($xt){
+	public function __construct(&$xt){
 		$this->debug=0;
 
 		$this->xml=$xt->xml;
