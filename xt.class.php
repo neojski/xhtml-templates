@@ -21,6 +21,7 @@
  */
 // include main class
 require_once('xt.xtException.php');
+require_once('xt.mydom.php');
 require_once('xt.core.php');
 
 ?>

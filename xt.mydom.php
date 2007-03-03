@@ -19,20 +19,18 @@
  *	License along with this library; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-function HandleXmlError($errno, $errstr, $errfile, $errline){
-	if($errno==E_WARNING && (substr_count($errstr,"DOMDocument::loadXML()")>0)){
-		throw new DOMException($errstr);
-	}else{
-		return false;
-	}
-}
+
 
 class mydom extends domdocument{
 	public function loadxml($str, $options=0){
-		set_error_handler('HandleXmlError');
-		$dom = new DOMDocument();
+		set_error_handler(array($this,'loadXMLError'));
+		$return=parent::loadxml($str);
 		restore_error_handler();
-		return $dom;
+		return $return;
+	}
+
+	public function loadXMLError($errno, $errstr, $errfile, $errline){
+		throw new xtException('Niepoprawny szablon'.$errstr, E_ERROR);
 	}
 }
 

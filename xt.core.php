@@ -97,7 +97,7 @@ class xt{
 		
 		$this->template=str_replace(array('<![CDATA[', ']]>'), '', $this->template);
 		
-		$this->xml=new DOMDocument();
+		$this->xml=new mydom();
 		
 		//$this->xml->resolveExternals=true;
 		
