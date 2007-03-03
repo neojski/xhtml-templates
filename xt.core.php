@@ -187,14 +187,20 @@ class xt{
 			return $this->xml->savexml();
 		}elseif($mime==1){
 			if($this->useXML){
-				header('Content-Type: application/xhtml+xml; charset='.$this->encoding);
+				if(!headers_sent()){
+					header('Content-Type: application/xhtml+xml; charset='.$this->encoding);
+				}
 				echo $this->xml->savexml();
 			}else{
-				header('Content-Type: text/html; charset='.$this->encoding);
+				if(!headers_sent()){
+					header('Content-Type: text/html; charset='.$this->encoding);
+				}
 				echo preg_replace(array('#<!DOCTYPE[^>]+>#', '#xml:lang="[^"]+"#', '#xmlns="[^"]+"#'), array('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">', '', ''), $this->xml->saveHTML());
 			}
 		}else{
-			header('Content-Type: '.$mime_tab[$mime].'; charset='.$this->encoding);
+			if(!headers_sent()){
+				header('Content-Type: '.$mime_tab[$mime].'; charset='.$this->encoding);
+			}
 			echo $this->xml->savexml();
 		}
 	}
