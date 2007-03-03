@@ -249,15 +249,6 @@ class xt{
 	}
 	
 	/**
-	 * na razie miniaturowa funkcja "obsługująca" błędy uniemożliwiające dalsze działanie
-	 * TODO:
-	 *  podział na błędy uniemożliwiające działanie i ostrzeżenia, np. nie znaleziono obiektu
-	 */
-	public function error($str){
-		die('<strong>'.$str.'</strong>');
-	}
-	
-	/**
 	 * dodanie zawartości tekstowej obiektowi
 	 * @param object domelement
 	 * @param str append-text
