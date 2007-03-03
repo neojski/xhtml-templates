@@ -65,19 +65,6 @@ class xt{
 	}
 	
 	/**
-	 * small tidy
-	 * removed
-	 ^^^^^^^^^^^^^
-	 */
-	function tidy($str){
-		//if(!$this->strict){
-		//	return $this->small_tidy->clean($str);
-		//}else{
-			return $str;
-		//}
-	}
-	
-	/**
 	 * antyliterówka
 	 */
 	public function __call($name, $arguments){
@@ -107,8 +94,6 @@ class xt{
 		}else{
 			$this->template=$file;
 		}
-		
-		$this->template = $this->tidy($this->template);
 		
 		$this->template=str_replace(array('<![CDATA[', ']]>'), '', $this->template);
 		
@@ -288,7 +273,6 @@ class xt{
 		if($this->is_node($str)){
 			return $str;
 		}elseif(is_string($str)){
-			$str=$this->tidy($str);
 			$fragment=$this->xml->createDocumentFragment();
 			$fragment->appendXML($str);
 			return $fragment;

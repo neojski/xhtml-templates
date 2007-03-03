@@ -35,7 +35,6 @@ class fragment extends xt{
 		}else{
 			$this->error('Incompatible template type');
 		}
-		$this->template=$this->tidy($this->template);
 		
 		$this->s=$this->parent->createDocumentFragment(); //tej durnej nazwy używa add() ;-)
 		$this->s->appendXML($this->template);
