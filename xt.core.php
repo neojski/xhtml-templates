@@ -66,13 +66,15 @@ class xt{
 	
 	/**
 	 * small tidy
+	 * removed
+	 ^^^^^^^^^^^^^
 	 */
 	function tidy($str){
-		if(!$this->strict){
-			return $this->small_tidy->clean($str);
-		}else{
+		//if(!$this->strict){
+		//	return $this->small_tidy->clean($str);
+		//}else{
 			return $str;
-		}
+		//}
 	}
 	
 	/**
