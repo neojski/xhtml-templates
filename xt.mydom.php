@@ -19,8 +19,21 @@
  *	License along with this library; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-// include main class
-require_once('xt.xtException.php');
-require_once('xt.core.php');
+function HandleXmlError($errno, $errstr, $errfile, $errline){
+	if($errno==E_WARNING && (substr_count($errstr,"DOMDocument::loadXML()")>0)){
+		throw new DOMException($errstr);
+	}else{
+		return false;
+	}
+}
+
+class mydom extends domdocument{
+	public function loadxml($str, $options=0){
+		set_error_handler('HandleXmlError');
+		$dom = new DOMDocument();
+		restore_error_handler();
+		return $dom;
+	}
+}
 
 ?>

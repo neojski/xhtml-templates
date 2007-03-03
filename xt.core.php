@@ -80,7 +80,7 @@ class xt{
 	 */
 	public function __call($name, $arguments){
 		if(!method_exists($this, $name)){
-			$this->error('Metoda '.$name.' nie istnieje!');
+			 throw new xtException('Metoda '.$name.' nie istnieje!', E_WARNING);
 		}
 	}
 	
@@ -100,7 +100,7 @@ class xt{
 			if(file_exists($file)){
 				$this->template=file_get_contents($file);
 			}else{
-				$this->error('Template file '.$file.' not found.');
+				throw new xtException('Plik szablonu nie istnieje!', E_ERROR);
 			}
 		}else{
 			$this->template=$file;
@@ -120,7 +120,7 @@ class xt{
 			$this->template='<?xml version="1.0" encoding="'.$encoding[1].'"?>'.$this->template;
 			$this->encoding=$encoding[1];
 		}else{
-			$this->error('Brak ustawionego kodowania');
+			throw new xtException('Brak ustawionego kodowania', E_ERROR);
 		}
 		
 		$this->xml->loadxml($this->template);

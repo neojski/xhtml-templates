@@ -19,8 +19,18 @@
  *	License along with this library; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-// include main class
-require_once('xt.xtException.php');
-require_once('xt.core.php');
+class xtException extends Exception{
+	public function __construct($message, $code = 0){
+		if($code ==1){
+			die($message);
+		}
+		parent::__construct($message, $code);
+	}
+	
+	public function __toString(){
+		return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
+	}
+}
+
 
 ?>
