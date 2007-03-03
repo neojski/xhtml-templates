@@ -359,9 +359,11 @@ class getNode{
 		if(empty($this->xpath)){
 			return null;
 		}else{
-			$xpath = new DOMXPath($this->xml);
+			if(!isset($this->xpo)){
+				$this->xpo = new DOMXPath($this->xml);
+			}
 			
-			$results = $xpath->query($this->xpath, $this->parent);
+			$results = $this->xpo->query($this->xpath, $this->parent);
 			
 			if($this->debug){
 				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';

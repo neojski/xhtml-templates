@@ -212,6 +212,10 @@ class xt{
 		}
 	}
 	
+	public function __tostring(){
+		return $this->display(0);
+	}
+	
 	/**
 	 * delete parent of the node
 	 * @param domnode node
@@ -248,9 +252,6 @@ class xt{
 	 * @return bool is_dom_object
 	 */
 	protected function is_node($node){
-		/*ob_start();
-		var_dump($node, true);
-		return(substr(ob_get_clean(), 0, 10)=='object(DOM')?true:false;*/
 		return substr(print_r($node,true),0,3)==='DOM';
 	}
 	
