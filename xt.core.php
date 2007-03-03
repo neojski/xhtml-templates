@@ -248,9 +248,10 @@ class xt{
 	 * @return bool is_dom_object
 	 */
 	protected function is_node($node){
-		ob_start();
-		var_dump($node);
-		return(substr(ob_get_clean(), 0, 10)=='object(DOM')?true:false;
+		/*ob_start();
+		var_dump($node, true);
+		return(substr(ob_get_clean(), 0, 10)=='object(DOM')?true:false;*/
+		return substr(print_r($node,true),0,3)==='DOM';
 	}
 	
 	/**
