@@ -19,21 +19,25 @@
  *	License along with this library; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
+ 
+// define constant variables
+define('GETNODE_METHOD_XPATH', 1);
+define('GETNODE_METHOD_CSS',2);
+
+define('XHTML', 2);
+define('HTML', 3);
+define('XML', 4);
+define('RSS', 5);
+define('ATOM', 6);
 class xt{
 	public function __construct($file=0, $is_string=0){
 		$this->find_plugins();
-		
 		$this->start_time=$this->microtime_float();
-		if($file){
-			$this->load($file, $is_string);
-		}
 		$this->debug=false;
 		$this->getnode_method=2;
-		if(!defined('GETNODE_METHOD_XPATH')){
-			define('GETNODE_METHOD_XPATH', 1);
-		}
-		if(!defined('GETNODE_METHOD_CSS')){
-			define('GETNODE_METHOD_CSS',2);
+		$this->strict=false;
+		if($file){
+			$this->load($file, $is_string);
 		}
 	}
 	
@@ -64,7 +68,11 @@ class xt{
 	 * small tidy
 	 */
 	function tidy($str){
-		return $this->small_tidy->clean($str);
+		if(!$this->strict){
+			return $this->small_tidy->clean($str);
+		}else{
+			return $str;
+		}
 	}
 	
 	/**
@@ -100,21 +108,11 @@ class xt{
 		
 		$this->template = $this->tidy($this->template);
 		
-		$this->template=str_replace(array('<![CDATA[', ']]>'), '', $this->template); //remove CDATAs
-		//$this->template=preg_replace('#^(.*?)//\s*$#m', '\1', $this->template);  //delete empty inline comments
-		//$this->template=preg_replace('#/\*\s*\*/#s', '', $this->template); //delete empty multiline comments
+		$this->template=str_replace(array('<![CDATA[', ']]>'), '', $this->template);
 		
 		$this->xml=new DOMDocument();
 		
 		//$this->xml->resolveExternals=true;
-		
-		/*
-			powinno być
-			<?xml version="1.0" encoding="ISO-8859-2"?>
-			
-			ewentualnie
-			<meta http-equiv="content-type" content="text/html;charset=iso-8859-2" />
-		*/
 		
 		if(preg_match('#<\?xml[^>]+encoding="([^"]+)"[^>]*?>#', $this->template, $encoding)){
 			$this->encoding=$encoding[1];
@@ -195,12 +193,6 @@ class xt{
 			'application/rss+xml',
 			'application/atom+xml'
 		);
-		
-		define('XHTML', 2);
-		define('HTML', 3);
-		define('XML', 4);
-		define('RSS', 5);
-		define('ATOM', 6);
 
 		if($this->debug){
 			echo '<pre><code>'.htmlspecialchars($this->xml->savexml()).'</code></pre>';
@@ -212,7 +204,7 @@ class xt{
 				echo $this->xml->savexml();
 			}else{
 				header('Content-Type: text/html; charset='.$this->encoding);
-				echo preg_replace(array('#<!DOCTYPE[^>]+>#', '#xml:lang#', '#xmlns="[^"]+"#'), array('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">', 'lang', ''), $this->xml->saveHTML());
+				echo preg_replace(array('#<!DOCTYPE[^>]+>#', '#xml:lang="[^"]+"#', '#xmlns="[^"]+"#'), array('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">', '', ''), $this->xml->saveHTML());
 			}
 		}else{
 			header('Content-Type: '.$mime_tab[$mime].'; charset='.$this->encoding);
@@ -636,9 +628,11 @@ class xt{
 	 * create document-fragment
 	 * @param str template_fragment
 	 */
-	public function fragment($str=0){
+	public function fragment($str=false){
 		$fragment=$this->fragment;
-		$fragment->load($str, $this->xml);
+		if($str){
+			$fragment->load($str);
+		}
 		return $fragment;
 	}
 	
