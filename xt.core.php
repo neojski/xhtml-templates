@@ -76,7 +76,7 @@ class xt{
 	/**
 	 * check parsing time
 	 */
-	private function microtime_float(){
+	public function microtime_float(){
 		list($usec, $sec) = explode(" ", microtime());
 		return ((float)$usec + (float)$sec);
 	}
@@ -298,7 +298,7 @@ class xt{
 	 * @param mixed reference_to_object_css_like
 	 * @return null / object domnode
 	 */
-	public function getnode($name, $parent=0){
+	public function getnode($name, $parent=0, $count=false){
 		if($this->is_node($name)){
 			return $name;
 		}else{
@@ -306,15 +306,16 @@ class xt{
 			if(!$parent){
 				$parent=$this->root;
 			}
-			return $str->get($name, $parent);
+			return $str->get($name, $parent, $count);
 		}
 	}
 	
-	private function getOneNode($name, $parent=0){
+	public function getOneNode($name, $parent=0){
 		if($this->is_node($name)){
 			return $name;
 		}else{
-			$nodes=$this->getNode($name, $parent); // getNode($name.':first-of-type', $parent);
+			$nodes=$this->getNode($name, $parent, 0); // getNode($name.':first-of-type', $parent);
+			
 			return $nodes->item(0);
 		}
 	}
@@ -547,65 +548,6 @@ class xt{
 		if($node=$this->getOneNode($node)){
 			$fragment=$this->fragment($this->savexml($node));
 			return $fragment;
-		}
-	}
-	
-	/**
-	 * funkcje dodatkowe, htmlowe
-	 */
-	public function link($url, $rel, $title=false, $type=false, $media=false){
-		$link=$this->create('link', null, array('rel'=>$rel, 'href'=>$url, 'title'=>$title, 'type'=>$type, 'media'=>$media));
-		$this->head->appendChild($link);
-	}
-	
-	public function cssFile($url, $title=false, $media=false){
-		$this->link($url, 'stylesheet', $title, 'text/css', $media);
-	}
-	
-	public function jsFile($url, $alternate_code=null){
-		$this->head->appendChild($this->create('script', $alternate_code, array('type'=>'text/javascript','src'=>$url)));
-	}
-
-	/**
-	 * @param str css-input
-	 * @param bool dodać-nowy-tag-style
-	 */
-	public function css($str, $new=0){
-		if($new){
-			$this->head->appendChild($this->create('style', '<![CDATA['. trim($str) .']]>', array('type'=>'text/css')));
-		}else{
-			if($style=$this->getElementByTagName('style', $this->head)){
-				$style->firstChild->data.=trim($str);
-			}else{
-				$this->css($str, 1);
-			}
-		}
-	}
-	
-	/**
-	 * @param str kod_javascript
-	 * @param bool add_new_tag
-	 */
-	public function js($str, $new=0){
-		if($new){
-			$this->head->appendChild($this->create('script', '<![CDATA['. trim($str) .']]>', array('type'=>'text/javascript')));
-		}else{
-			if($script=$this->getElementByTagName('script', $this->head)){
-				$script->firstChild->data.=trim($str);
-			}else{
-				$this->js($str, 1);
-			}
-		}
-	}
-
-	/**
-	 * set style to the object
-	 * @param mixed node
-	 * @param str style
-	 */
-	public function setStyle($name, $style){
-		if($node=$this->getOneNode($name)){
-			$node->setAttribute('style', $style);
 		}
 	}
 	

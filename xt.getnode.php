@@ -24,6 +24,7 @@
  */
 class getNode{
 	public function __construct(&$xt){
+		$this->core=$xt;
 		$this->debug=0;
 
 		$this->xml=$xt->xml;
@@ -32,7 +33,7 @@ class getNode{
 		$this->method=$xt->getnode_method;
 	}
 	
-	public function get($str, $parent=0){
+	public function get($str, $parent=0, $n=false){
 		$this->parent=$parent?$parent:$this->root;
 		if($this->method===2){
 			$this->xpath='.';
@@ -54,7 +55,7 @@ class getNode{
 				$this->add($str, $glue);
 			}
 			
-			$objects=$this->getobjects();
+			$objects=$this->getobjects($n);
 			
 			if($this->debug){
 			echo 'Lista<ul>';
@@ -355,12 +356,16 @@ class getNode{
 		}
 	}
 	
-	private function getobjects(){
+	private function getobjects($count=false){
 		if(empty($this->xpath)){
 			return null;
 		}else{
 			if(!isset($this->xpo)){
 				$this->xpo = new DOMXPath($this->xml);
+			}
+
+			if(is_int($count)){
+				//$this->xpath.='[position()='.$count.']';
 			}
 			
 			$results = $this->xpo->query($this->xpath, $this->parent);
