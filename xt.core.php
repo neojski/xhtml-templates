@@ -19,7 +19,6 @@
  *	License along with this library; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
- 
 // define constant variables
 define('GETNODE_METHOD_XPATH', 1);
 define('GETNODE_METHOD_CSS',2);
@@ -320,45 +319,7 @@ class xt{
 		}
 	}
 	
-	/**
-	 * getElementsByTagName, teoretycznie niepotrzebna
-	 */
-	public function getElementsByTagName($tag, $parent=0){
-		if(!$parent){
-			$parent=$this->root;
-		}
-		return $parent->getElementsByTagName($tag);
-	}
 	
-	/**
-	 * zwraca tag element o podanej nazwie
-	 */
-	public function getElementByTagName($tag, $parent=0, $count=0){
-		if(!$parent){
-			$parent=$this->root;
-		}
-		return $this->getElementsByTagName($tag, $parent)->item($count);
-	}
-	
-	/**
-	 * zwraca obiekt mając za parametr jego id
-	 * @param str object
-	 * @param object domnode 
-	 * @param str node name
-	 * @return object domnode
-	 */
-	public function getElementById($id, $parent=0, $node_name=0){
-		if(!$parent){
-			$parent=$this->root;
-		}
-		if(!$node_name){
-			$node_name='*';
-		}
-		$xpath = new DOMXPath($this->xml);
-		$query = './descendant-or-self::'.$node_name.'[@id="'.$id.'"]';
-		$entries = $xpath->query($query, $parent);
-		return $entries->item(0);
-	}
 	
 	/**
 	 * usuwa id wszystkich dzieci i danego obiektu
@@ -552,18 +513,6 @@ class xt{
 	}
 	
 	/**
-	 * create document-fragment
-	 * @param str template_fragment
-	 */
-	public function fragment($str=false){
-		$fragment=$this->fragment;
-		if($str){
-			$fragment->load($str);
-		}
-		return $fragment;
-	}
-	
-	/**
 	 * something like
 	 * {if condition}
 	 *   object
@@ -603,6 +552,69 @@ class xt{
 		$query.=']';
 		$xpath = new DOMXPath($this->xml);
 		return $xpath->query($query, $parent);
+	}
+	
+	/**
+	 * getElementsByTagName, teoretycznie niepotrzebna
+	 */
+	public function getElementsByTagName($tag, $parent=0){
+		if(!$parent){
+			$parent=$this->root;
+		}
+		return $parent->getElementsByTagName($tag);
+	}
+	
+	/**
+	 * zwraca tag element o podanej nazwie
+	 */
+	public function getElementByTagName($tag, $parent=0, $count=0){
+		if(!$parent){
+			$parent=$this->root;
+		}
+		return $this->getElementsByTagName($tag, $parent)->item($count);
+	}
+	
+	/**
+	 * zwraca obiekt mając za parametr jego id
+	 * @param str object
+	 * @param object domnode 
+	 * @param str node name
+	 * @return object domnode
+	 */
+	public function getElementById($id, $parent=0, $node_name=0){
+		if(!$parent){
+			$parent=$this->root;
+		}
+		if(!$node_name){
+			$node_name='*';
+		}
+		$xpath = new DOMXPath($this->xml);
+		$query = './descendant-or-self::'.$node_name.'[@id="'.$id.'"]';
+		$entries = $xpath->query($query, $parent);
+		return $entries->item(0);
+	}
+	
+	/**
+	 * plugins which needs special inteface
+	 */
+	
+	/**
+	 * create document-fragment
+	 * @param str template_fragment
+	 */
+	public function fragment($str=false){
+		$fragment=$this->fragment;
+		if($str){
+			$fragment->load($str);
+		}
+		return $fragment;
+	}
+	
+	public function switcher(){
+		$objects=func_get_args();
+		$switcher=$this->switcher;
+		$switcher->load($objects);
+		return $switcher;
 	}
 }
 ?>
