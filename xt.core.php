@@ -380,7 +380,7 @@ class xt{
 	 */
 	public function add($name, $value){
 		if($node=$this->getOneNode($name)){
-			if(is_array($value) && is_array($value[0])){
+			if(is_array($value) && isset($value[0]) && is_array($value[0])){
 				//$node->removeAttribute('id');
 				$this->r($node, $value);
 			}elseif(is_array($value)){
@@ -573,28 +573,20 @@ class xt{
 		if(!$parent){
 			$parent=$this->root;
 		}
-		
 		if(!$name){
 			$name='*';
 		}
-		
 		if(!is_array($class)){
 			$class=array($class);
 		}
-		
 		$query = $name.'[';
-		
 		foreach($class as $c){
 			$query.='contains(concat(" ", @class, " "), " '.$c.' ") and ';
 		}
-			
 		$query=substr($query, 0, -4);
-			
 		$query.=']';
-			
 		$xpath = new DOMXPath($this->xml);
-		return $xpath->query($query);
+		return $xpath->query($query, $parent);
 	}
 }
-
 ?>

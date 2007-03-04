@@ -306,7 +306,11 @@ class getNode{
 					$position='position()';
 				}
 				
-				
+				if(strpos($match, 'of-type')!==false){
+					$nazwa='type';
+				}else{
+					$nazwa='child';
+				}
 				
 				if(preg_match('#(-?(\d+)?)n#', $param, $a)){
 					if(empty($a[1])){
@@ -340,14 +344,14 @@ class getNode{
 			break;
 		}
 		
-		if($type){
+		if(isset($type) && strlen($type)>0){
 			if(!$not){
 				$this->type[]=$type;
 			}else{
 				$this->type[]='not('.$type.')';
 			}
 		}
-		if($child){
+		if(isset($child) && strlen($child)>0){
 			if(!$not){
 				$this->child[]=$child;
 			}else{
