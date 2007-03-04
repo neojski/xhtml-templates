@@ -564,6 +564,22 @@ class xt{
 	}
 	
 	/**
+	 * something like
+	 * {if condition}
+	 *   object
+	 * {/if}
+	 *
+	 * if condition isn't true - delete object
+	 */
+	public function condition($condition, $object){
+		if($node=$this->getOneNode($object)){
+			if(!$condition){
+				$this->remove($node);
+			}
+		}
+	}
+	
+	/**
 	 * zwraca listę obiektów w formie domnodelist
 	 * @param mixed klasa
 	 * @param domnode parent
