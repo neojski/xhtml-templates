@@ -19,34 +19,19 @@
  *	License along with this library; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-class switcher{
+ 
+class html{
 	public function __construct(&$xt){
 		$this->core=$xt;
 	}
 	
-	public function load($objects){
-		if(is_array($objects)){
-			$this->objects=$objects;
-		}else{
-			throw new xtException('Funkcja switcher wymaga podania argumentów!!!!!!!!1');
-		}
-	}
-	
-	public function choose($object){
-		if(is_int($object)){
-			if(isset($this->objects[$object])){
-				unset($this->objects[$object]);
-			}
-		}else{
-			if(($key=array_search($object, $this->objects))!==false){
-				unset($this->objects[$key]);
-			}
-		}
-		foreach($this->objects as $object){
-			if($node=$this->core->getOneNode($object)){
-				$this->core->remove($node);
-			}
-		}
-	}
+	/**
+	 * some html functions
+	 * for exapmle
+	 *  form
+	 *  img
+	 *  input
+	 * look - css or js plugin
+	 */
 }
 ?>
