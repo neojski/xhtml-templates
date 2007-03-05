@@ -23,16 +23,14 @@ class fragment extends xt{
 		$this->parent=$xt->xml;
 	}
 	public function load($file, $is_string=0){
-		if(is_file($file)){
+		if(!$is_string){
 			if(file_exists($file)){
 				$this->template=file_get_contents($file);
 			}else{
-				$this->error('Template file '.$file.' not found.');
+				throw new xtException('Plik szablonu nie istnieje!', E_ERROR);
 			}
-		}elseif(is_string($file)){
-			$this->template=$file;
 		}else{
-			$this->error('Incompatible template type');
+			$this->template=$file;
 		}
 		
 		$this->s=$this->parent->createDocumentFragment(); //tej durnej nazwy używa add() ;-)
@@ -43,7 +41,6 @@ class fragment extends xt{
 		
 		$this->xml=$this->parent;
 	}
-	
 	public function getElementsByTagName($tag, $parent=0){
 		if(!$parent){
 			$parent=$this->root;

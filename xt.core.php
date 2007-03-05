@@ -100,14 +100,7 @@ class xt{
 		
 		//$this->xml->resolveExternals=true;
 		
-		if(preg_match('#<\?xml[^>]+encoding="([^"]+)"[^>]*?>#', $this->template, $encoding)){
-			$this->encoding=$encoding[1];
-		}elseif(preg_match('#<meta[^>]+content="[^=]+=(.*?)"[^>]*>#s', $this->template, $encoding)){
-			$this->template='<?xml version="1.0" encoding="'.$encoding[1].'"?>'.$this->template;
-			$this->encoding=$encoding[1];
-		}else{
-			throw new xtException('Brak ustawionego kodowania', E_ERROR);
-		}
+		$this->check_encoding();
 		
 		$this->xml->loadxml($this->template);
 		
@@ -118,6 +111,17 @@ class xt{
 		$this->xml->formatOutput=true;
 		$this->xml->standalone=false;
 		$this->useXML=$this->xml();
+	}
+	
+	private function check_encoding(){
+		if(preg_match('#<\?xml[^>]+encoding="([^"]+)"[^>]*?>#', $this->template, $encoding)){
+			$this->encoding=$encoding[1];
+		}elseif(preg_match('#<meta[^>]+content="[^=]+=(.*?)"[^>]*>#s', $this->template, $encoding)){
+			$this->template='<?xml version="1.0" encoding="'.$encoding[1].'"?>'.$this->template;
+			$this->encoding=$encoding[1];
+		}else{
+			throw new xtException('Brak ustawionego kodowania', E_ERROR);
+		}
 	}
 	
 	/**
