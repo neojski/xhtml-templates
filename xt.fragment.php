@@ -21,7 +21,6 @@
 class fragment extends xt{
 	public function __construct(&$xt){
 		$this->parent=$xt->xml;
-		parent::__construct();
 	}
 	public function load($file, $is_string=0){
 		if(is_file($file)){
