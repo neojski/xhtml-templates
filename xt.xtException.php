@@ -22,7 +22,7 @@
 class xtException extends Exception{
 	public function __construct($message, $code = 0){
 		if($code ==1){
-			die('umieram!'.$message);
+			die('(z exception - umieram)'.$message);
 		}
 		parent::__construct($message, $code);
 	}

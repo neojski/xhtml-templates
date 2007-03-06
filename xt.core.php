@@ -88,7 +88,7 @@ class xt{
 			if(file_exists($file)){
 				$this->template=file_get_contents($file);
 			}else{
-				throw new xtException('Plik szablonu nie istnieje!', E_ERROR);
+				throw new xtException('Plik szablonu <code>'.htmlspecialchars($file).'</code> nie istnieje', E_ERROR);
 			}
 		}else{
 			$this->template=$file;
@@ -395,7 +395,7 @@ class xt{
 			$count=(int)$count;
 			if($count>0){
 				for($i=0; $i<$count; $i++){
-					$fragment=$this->fragment($str);
+					$fragment=$this->fragment($str, true);
 					
 					$node->parentNode->insertBefore($fragment->s, $node);
 					
@@ -606,10 +606,10 @@ class xt{
 	 * create document-fragment
 	 * @param str template_fragment
 	 */
-	public function fragment($str=false){
+	public function fragment($str=false, $is_string=false){
 		$fragment=$this->fragment;
 		if($str){
-			$fragment->load($str);
+			$fragment->load($str, $is_string);
 		}
 		return $fragment;
 	}

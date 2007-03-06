@@ -30,7 +30,7 @@ class mydom extends domdocument{
 	}
 
 	public function loadXMLError($errno, $errstr, $errfile, $errline){
-		throw new xtException('Niepoprawny szablon'.$errstr, E_ERROR);
+		throw new xtException('Szablon musi być poprawnym dokumentem <abbr title="Extensible Markup Language">xml</abbr>, jednak parser wyświetlił błąd: <code>'.$errstr.'</code>', E_ERROR);
 	}
 }
 

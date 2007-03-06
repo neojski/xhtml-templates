@@ -21,13 +21,14 @@
 class fragment extends xt{
 	public function __construct(&$xt){
 		$this->parent=$xt->xml;
+		parent::__construct();//should be removed?
 	}
-	public function load($file, $is_string=0){
+	public function load($file, $is_string=false){
 		if(!$is_string){
 			if(file_exists($file)){
 				$this->template=file_get_contents($file);
 			}else{
-				throw new xtException('Plik szablonu nie istnieje!', E_ERROR);
+				throw new xtException('Plik szablonu <code>'.htmlspecialchars($file).'</code> nie istnieje', E_ERROR);
 			}
 		}else{
 			$this->template=$file;
