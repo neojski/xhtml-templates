@@ -222,6 +222,9 @@ class xt{
 				$node->parentNode->insertBefore($child->cloneNode(true), $node);
 			}
 			$this->remove($node);
+			return true;
+		}else{
+			return false;
 		}
 	}
 	
@@ -230,15 +233,20 @@ class xt{
 	 * @param mixed old
 	 * @param string new
 	 * @param array attributes
-	 ^^^^^^^^^^^^^^^^^^^^^^^^^
 	 */
 	public function replaceParent($name, $new_name, $attributes=0){
 		if($node=$this->getOneNode($name)){
-			$old=$this->removeParent($node);
+			$old=$this->xml->createdocumentfragment();
+			foreach($node->childNodes as $child){
+				$old->appendChild($child->cloneNode(true));
+			}
 			$new=$this->create($new_name, 0, $attributes);
 			$new->appendChild($old);
-			$this->insertBefore($new, $node);
+			$this->insertBefore($node,$new);
 			$this->remove($node);
+			return true;
+		}else{
+			return false;
 		}
 	}
 	
@@ -337,6 +345,8 @@ class xt{
 			foreach($entries as $node){
 				$node->removeAttribute('id');
 			}
+		}else{
+			return false;
 		}
 	}
 	
@@ -356,7 +366,11 @@ class xt{
 				$node->appendChild($value);
 			}elseif($value instanceof fragment){
 				$node->appendChild($value->s);
+			}else{
+				throw new xtException('Niepoprawny drugi parametr metody <code>add</code>: <code>'.htmlspecialchars(print_r($value, 1)).'</code>', E_WARNING);
 			}
+		}else{
+			return false;
 		}
 	}
 	
@@ -386,8 +400,7 @@ class xt{
 	
 	/**
 	 * pętla drugiego rodzaju
-	 * nie działa jak należy
-	 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	 * nie działa jak należy (?)
 	 */
 	public function loop($name, $count, $delete_sample=true){
 		if($node=$this->getOneNode($name)){
@@ -431,6 +444,8 @@ class xt{
 				}
 				
 			}
+		}else{
+			return false;
 		}
 	}
 	
@@ -453,10 +468,13 @@ class xt{
 	
 	/**
 	 * usuwanie obiektów
+	 * zwraca usuwane dziecko
 	 */
 	public function remove($name){
 		if($node=$this->getOneNode($name)){
-			$node->parentNode->removeChild($node);
+			return $node->parentNode->removeChild($node);
+		}else{
+			return false;
 		}
 	}
 	
@@ -469,8 +487,7 @@ class xt{
 	
 	/**
 	 * tak jak domowa, nie obsługuje pętli
-	 * TODO:
-	 *  obsługa pętli - wykorzystywanie funkcji add
+	 * UWAGA!!! niekompatybilny z domowym!!!
 	 */
 	public function insertBefore($old, $new){
 		if($old=$this->getOneNode($old)){
@@ -479,6 +496,8 @@ class xt{
 			}elseif($new=$this->text2html($new)){
 				$old->parentNode->insertBefore($new, $old);
 			}
+		}else{
+			return false;
 		}
 	}
 	
@@ -503,6 +522,8 @@ class xt{
 			// jeśl nie ma nikogo za ;-)
 				$old->parentNode->appendChild($fragment);
 			}
+		}else{
+			return false;
 		}
 	}
 	
@@ -513,6 +534,8 @@ class xt{
 		if($node=$this->getOneNode($node)){
 			$fragment=$this->fragment($this->savexml($node));
 			return $fragment;
+		}else{
+			return null;
 		}
 	}
 	

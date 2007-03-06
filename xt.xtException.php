@@ -22,13 +22,13 @@
 class xtException extends Exception{
 	public function __construct($message, $code = 0){
 		if($code ==1){
-			die('(z exception - umieram)'.$message);
+			//die('(z exception - umieram)'.$message);
 		}
 		parent::__construct($message, $code);
 	}
 	
 	public function __toString(){
-		return 'okropny błąd'.__CLASS__ . ": [{$this->code}]: {$this->message}\n";
+		return '<p>Klasa <code>'.__CLASS__ . '</code> wyświetliła błąd numer '.$this->code.': '.$this->message.'</p>';
 	}
 }
 

@@ -42,7 +42,7 @@ class css{
 		$this->core->head->appendChild($link);
 	}
 	
-	public function setStyle($name, $style){
+	public function set($name, $style){
 		if($node=$this->core->getOneNode($name)){
 			$node->setAttribute('style', $style);
 		}
