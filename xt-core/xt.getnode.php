@@ -301,7 +301,7 @@ class getNode{
 			case ':nth-of-type':
 			case ':nth-last-of-type':
 				if(strpos($match, 'last')!==false){
-					$position='(last()-position())';
+					$position='(last()-position()+1)';
 				}else{
 					$position='position()';
 				}
@@ -330,12 +330,11 @@ class getNode{
 				}else{
 					$b=(int)$b[1];
 				}
-				
-				
+
 				if($a==1){
 					$$nazwa=$position.'>'.($b-1);
 				}elseif($a==-1){
-					$$nazwa=$position.'<'.($b-1);
+					$$nazwa=$position.'<'.($b+1);
 				}elseif($a){
 					$$nazwa='('.$position.'+'.(-$b).')*'.$a.'>=0 and ('.$position.'+'.(-$b).') mod '.$a.'=0';
 				}else{
