@@ -20,8 +20,8 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 // include main class
-require_once('xt.xtException.php');
-require_once('xt.mydom.php');
-require_once('xt.core.php');
+require_once('xt-core/xt.xtException.php');
+require_once('xt-core/xt.mydom.php');
+require_once('xt-core/xt.core.php');
 
 ?>
