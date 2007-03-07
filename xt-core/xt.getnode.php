@@ -312,23 +312,31 @@ class getNode{
 					$nazwa='child';
 				}
 				
-				if(preg_match('#(-?(\d+)?)n#', $param, $a)){
-					if(empty($a[1])){
-						$a=1;
-					}elseif(empty($a[2])){
-						$a=-1;
-					}else{
-						$a=(int)$a[1];
-					}
-				}else{
-					$a=null;
-				}
-				
-				preg_match('#(-?\d+)(?!n)#', $param, $b);
-				if(empty($b[1])){
+				if($param=='even'){
+					$a=2;
 					$b=0;
+				}elseif($param=='odd'){
+					$a=2;
+					$b=1;
 				}else{
-					$b=(int)$b[1];
+					if(preg_match('#(-?(\d+)?)n#', $param, $a)){
+						if(empty($a[1])){
+							$a=1;
+						}elseif(empty($a[2])){
+							$a=-1;
+						}else{
+							$a=(int)$a[1];
+						}
+					}else{
+						$a=null;
+					}
+					
+					preg_match('#(-?\d+)(?!n)#', $param, $b);
+					if(empty($b[1])){
+						$b=0;
+					}else{
+						$b=(int)$b[1];
+					}
 				}
 
 				if($a==1){
