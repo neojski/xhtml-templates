@@ -60,7 +60,12 @@ class xt{
 		}
 		
 		if(in_array($name, $this->core)){
-			if(!isset($this->$name)){
+			if($name=='fragment'){
+				if(!class_exists('fragment')){
+					require_once('xt.frament.php');
+				}
+				return new fragment;
+			}elseif(!isset($this->$name)){
 				require_once('xt.'.$name.'.php');
 				$this->$name=new $name($this);
 			}
