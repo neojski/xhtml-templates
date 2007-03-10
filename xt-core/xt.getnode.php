@@ -202,9 +202,9 @@ class getNode{
 		$class=substr($class, 1);
 		
 		if(!$not){
-			$this->xpath.='[contains(concat(" ", @class, " "), " '.$class.' ")]';
+			$this->type[]='contains(concat(" ", @class, " "), " '.$class.' ")';
 		}else{
-			$this->xpath.='[not(contains(concat(" ", @class, " "), " '.$class.' "))]';
+			$this->type[]='not(contains(concat(" ", @class, " "), " '.$class.' "))';
 		}
 	}
 	
@@ -376,7 +376,7 @@ class getNode{
 			
 			$results = $this->xpo->query($this->xpath, $this->parent);
 			
-			if($this->debug||1){
+			if($this->debug){
 				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';
 			}
 			
