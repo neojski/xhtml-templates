@@ -31,8 +31,8 @@ define('ATOM', 6);
 class xt{
 	private $core=array('fragment', 'getnode', 'switcher');
 	public function __construct($file=0, $is_string=0){
-		$this->find_plugins();
 		$this->start_time=$this->microtime_float();
+		$this->find_plugins();
 		$this->debug=false;
 		$this->getnode_method=2;
 		$this->strict=false;
@@ -99,7 +99,7 @@ class xt{
 			$this->template=$file;
 		}
 		
-		$this->template=str_replace(array('<![CDATA[', ']]>'), '', $this->template);
+		//$this->template=str_replace(array('<![CDATA[', ']]>'), '', $this->template);
 		
 		$this->xml=new mydom();
 		
