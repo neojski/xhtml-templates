@@ -291,11 +291,6 @@ class getNode{
 			case ':lang':
 				$type='(@lang="'.$param.'" or contains(@lang, " '.$param.'-") or starts-with(@lang, "'.$param.'-"))';
 			break;
-			/*
-				dodać możliwość parametru na
-				even - 2n (parzysty)
-				odd - 2n+1 (nieparzysty)
-			*/
 			case ':nth-child':
 			case ':nth-last-child':
 			case ':nth-of-type':
