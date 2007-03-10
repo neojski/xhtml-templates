@@ -112,6 +112,9 @@ class xt{
 		
 		$this->check_encoding();
 		
+		/* usuń xmlns, które tymczasem psuje wszystko */
+		$this->template=preg_replace('#xmlns="[^"]+"#', '', $this->template);
+		
 		$this->xml->loadxml($this->template);
 		
 		$this->body=$this->xml->getElementsByTagName('body')->item(0);
