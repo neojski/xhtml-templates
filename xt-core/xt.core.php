@@ -60,7 +60,12 @@ class xt{
 		}
 		
 		if(in_array($name, $this->core)){
-			if(!isset($this->$name)){
+			if($name=='fragment'){
+				if(!class_exists('fragment')){
+					require_once('xt.fragment.php');
+				}
+				return new fragment($this);
+			}elseif(!isset($this->$name)){
 				require_once('xt.'.$name.'.php');
 				$this->$name=new $name($this);
 			}
@@ -106,6 +111,9 @@ class xt{
 		//$this->xml->resolveExternals=true;
 		
 		$this->check_encoding();
+		
+		/* usuń xmlns, które tymczasem psuje wszystko */
+		$this->template=preg_replace('#xmlns="[^"]+"#', '', $this->template);
 		
 		$this->xml->loadxml($this->template);
 		
