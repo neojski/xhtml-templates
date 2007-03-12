@@ -9,16 +9,14 @@
 	</ol>
 */
 
-include('../trunk/xt.class.php');
+include('../xt.class.php');
 
 try{
 	$xt=new xt('szablon.html');
 	
-	$xt->replaceParent('#test', 'em', array('style'=>'color:red'));
+	$xt->add('#a', 'test');
 	
-	$xt->css->set('body > *~*','color:blue');
-	
-	$xt->display(1);
+	$xt->display(3);
 	
 	
 }catch(xtException $e){

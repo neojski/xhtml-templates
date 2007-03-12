@@ -30,20 +30,20 @@ define('RSS', 5);
 define('ATOM', 6);
 class xt{
 	private $core=array('fragment', 'getnode', 'switcher');
-	public function __construct($file=0, $is_string=0){
+	public function __construct($file=0){ $this->cache=array(); $this->caches=array();
 		$this->start_time=$this->microtime_float();
 		$this->find_plugins();
 		$this->debug=false;
 		$this->getnode_method=2;
 		$this->strict=false;
 		if($file){
-			$this->load($file, $is_string);
+			$this->load($file);
 		}
 	}
 	
 	private function find_plugins(){
 		$this->plugins=array();
-		foreach(glob('../trunk/xt-plugins/*') as $file){
+		foreach(glob('../xt-plugins/*') as $file){
 			$this->plugins[]=substr(basename($file, '.php'), 3);
 		}
 	}
@@ -54,7 +54,7 @@ class xt{
 	public function __get($name){
 		if(in_array($name, $this->plugins)){
 			if(!isset($this->$name)){
-				require_once('../trunk/xt-plugins/xt.'.$name.'.php');
+				require_once('../xt-plugins/xt.'.$name.'.php');
 				$this->$name=new $name($this);
 			}
 		}
@@ -93,15 +93,12 @@ class xt{
 	/**
 	 * @param str filename/template
 	 */
-	public function load($file, $is_string=0){
-		if(!$is_string){
-			if(file_exists($file)){
-				$this->template=file_get_contents($file);
-			}else{
-				throw new xtException('Plik szablonu <code>'.htmlspecialchars($file).'</code> nie istnieje', E_ERROR);
-			}
+	public function load($file){
+		if(file_exists($file)){
+			$this->name=basename($file);
+			$this->template=file_get_contents($file);
 		}else{
-			$this->template=$file;
+			throw new xtException('Plik szablonu <code>'.htmlspecialchars($file).'</code> nie istnieje', E_ERROR);
 		}
 		
 		//$this->template=str_replace(array('<![CDATA[', ']]>'), '', $this->template);
@@ -186,7 +183,7 @@ class xt{
 			$node->removeAttribute('class');
 		}
 		
-		$this->add($this->body, '<p id="stopka">Ta strona została wygenerowana właśnie dzięki xt. Czas wykonywania skryptu to '.($this->microtime_float()-$this->start_time).'s</p>');
+		//$this->add($this->body, '<p id="stopka">Ta strona została wygenerowana właśnie dzięki xt. Czas wykonywania skryptu to '.($this->microtime_float()-$this->start_time).'s</p>');
 		
 		$mime_tab=array(
 			2 => 'application/xhtml+xml',
@@ -374,7 +371,18 @@ class xt{
 			}elseif(is_array($value)){
 				$this->set($node, $value);
 			}elseif(is_string($value)){
-				$this->appendText($node, $value);
+				/*
+					
+				*/
+				if(!in_array($name, $this->caches)){
+					$this->createCache=true;
+					$this->appendText($node, '<![CDATA[<?php echo $xt->cache[\''.$name.'\'];?>]]>');
+					
+					$this->cache[$name]=$value;
+				}else{
+					$this->cache[$name]=$value;
+				}
+				
 			}elseif($this->is_node($value)){
 				$node->appendChild($value);
 			}elseif($value instanceof fragment){
@@ -384,6 +392,13 @@ class xt{
 			}
 		}else{
 			return false;
+		}
+	}
+	
+	public function __destruct(){
+		if($this->createCache){ echo '<p style="color:red">zapisuję plik cache</p>';
+			$cache=str_replace(array('<![CDATA[<?php', '?>]]>'), array('<?php', '?>'), $this->display(0));
+			file_put_contents(dirname(__FILE__).'/../templates/'.$this->name.'.xc', $cache);
 		}
 	}
 	
