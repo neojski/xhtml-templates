@@ -164,7 +164,7 @@ class xt{
 	public function display($mime=0){
 		/************* xpath tests *****************
 		$xpath = new DOMXPath($this->xml);
-		$query = '//li/../li[position()=3]/self::li';
+		$query = '//div[substring(., 2)="d a"]';
 		$objects = $xpath->query($query);
 		
 		echo 'Obiekty<ul>';

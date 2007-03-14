@@ -80,7 +80,7 @@ class getNode{
 		$r_id='[_a-z0-9-]+';
 		$r_hash='\#'.$r_id;
 		$r_class='\.'.$r_name;
-		$r_attrib='\[\s*'.$r_name.'\s*(?:(?:\^=|\$=|\*=|=|~=|\|=)\s*"[^"]+"\s*)?\]';
+		$r_attrib='\[\s*(?:'.$r_name.'|\#text)\s*(?:(?:\^=|\$=|\*=|=|~=|\|=)\s*"[^"]+"\s*)?\]';
 		
 		$r_pseudo=':'.$r_id.'(?:\(.*?\))?';
 
@@ -209,35 +209,41 @@ class getNode{
 	}
 	
 	private function g_attribute($attribute, $not){
-		preg_match('#\[(.*?)(?:([~^$*|]?)="([^"]+)")?\]#', $attribute, $match);
+		preg_match('#\[(.*?|\#text)(?:([~^$*|]?)="([^"]+)")?\]#', $attribute, $match);
 		
-		$attribute=$match[1];
-		$separator=$match[2];
-		$value=$match[3];
+		if($match[1]=='#text'){
+			$attribute='.';
+			$separator=$match[2];
+			$value=$match[3];
+		}else{
+			$attribute='@'.$match[1];
+			$separator=$match[2];
+			$value=$match[3];
+		}
 		
-		if($value){
+		if(isset($value)){
 			switch($separator){
 				case '':
-					$match='@'.$attribute.'="'.$value.'"';
+					$match=$attribute.'="'.$value.'"';
 					break;
 				case '~':
-					$match='contains(concat(" ", @'.$attribute.', " "), " '.$value.' ")';
+					$match='contains(concat(" ", '.$attribute.', " "), " '.$value.' ")';
 					break;
 				case '^':
-					$match='starts-with(@'.$attribute.', "'.$value.'")';
+					$match='starts-with('.$attribute.', "'.$value.'")';
 					break;
 				case '$':
-					$match='substring(@'.$attribute.', string-length(@'.$attribute.')-'.strlen($value).')="'.$value.'"';
+					$match='substring('.$attribute.', string-length('.$attribute.')-'.strlen($value).')="'.$value.'"';
 					break;
 				case '*':
-					$match='contains(@'.$attribute.', "'.$value.'")';
+					$match='contains('.$attribute.', "'.$value.'")';
 					break;
 				case '|':
-					$match='@'.$attribute.'="'.$value.'" or contains(@'.$attribute.', " '.$value.'-") or starts-with(@'.$attribute.', "'.$value.'-")';
+					$match=$attribute.'="'.$value.'" or contains('.$attribute.', " '.$value.'-") or starts-with('.$attribute.', "'.$value.'-")';
 					break;
 			}
 		}else{
-			$match='@'.$attribute.'';
+			$match=$attribute;
 		}
 		
 		if(!$not){
