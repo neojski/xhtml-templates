@@ -97,9 +97,17 @@ class xt{
 		if(file_exists($file)){
 			$this->name=basename($file);
 			$this->template=file_get_contents($file);
+			
+			if(file_exists(dirname(__FILE__).'/../templates/'.$this->name.'.xc')){
+				$this->cached=file_get_contents(dirname(__FILE__).'/../templates/'.$this->name.'.xc');
+				
+			}
 		}else{
 			throw new xtException('Plik szablonu <code>'.htmlspecialchars($file).'</code> nie istnieje', E_ERROR);
 		}
+	}
+	
+	public function load_dom(){
 		
 		//$this->template=str_replace(array('<![CDATA[', ']]>'), '', $this->template);
 		
