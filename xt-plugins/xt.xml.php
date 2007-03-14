@@ -19,22 +19,10 @@
  *	License along with this library; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
- 
-if(!class_exists('xml')){
-	require_once('xml');
-}
-class html extends xml{
+class xml{
 	public function __construct(&$xt){
 		$this->core=$xt;
 	}
-	
-	/**
-	 * some html functions
-	 * for exapmle
-	 *  form
-	 *  img
-	 *  input
-	 * look - css or js plugin
-	 */
+
 }
 ?>
