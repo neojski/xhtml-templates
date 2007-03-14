@@ -20,14 +20,23 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
  
-if(!class_exists('xml')){
-	require_once('xml');
-}
-class html extends xml{
+//if(!class_exists('xml')){
+//	require_once('xt.xml.php');
+//}
+class html /*extends xml*/{
 	public function __construct(&$xt){
 		$this->core=$xt;
 	}
 	
+	public function title($str, $replace=false){
+		if($title=$this->core->getElementByTagName('title')){
+			if(!$replace){
+				$title->nodeValue.=$str;
+			}else{
+				$title->nodeValue=$str;
+			}
+		}
+	}
 	/**
 	 * some html functions
 	 * for exapmle

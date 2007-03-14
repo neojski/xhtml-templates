@@ -211,7 +211,7 @@ class getNode{
 	private function g_attribute($attribute, $not){
 		preg_match('#\[(.*?|\#text)(?:([~^$*|]?)="([^"]+)")?\]#', $attribute, $match);
 		
-		if($match[1]=='#text'){
+		if($match[1]=='#text'){ // magiczny atrybut oznaczający zawartość tekstową
 			$attribute='.';
 			$separator=$match[2];
 			$value=$match[3];
