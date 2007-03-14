@@ -233,7 +233,7 @@ class getNode{
 					$match='starts-with('.$attribute.', "'.$value.'")';
 					break;
 				case '$':
-					$match='substring('.$attribute.', string-length('.$attribute.')-'.strlen($value).')="'.$value.'"';
+					$match='substring('.$attribute.', string-length('.$attribute.')-'.(strlen($value)-1).')="'.$value.'"';
 					break;
 				case '*':
 					$match='contains('.$attribute.', "'.$value.'")';
@@ -245,6 +245,8 @@ class getNode{
 		}else{
 			$match=$attribute;
 		}
+		
+		echo $match;
 		
 		if(!$not){
 			$this->type[]=$match;
