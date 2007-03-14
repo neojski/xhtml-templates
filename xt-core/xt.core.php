@@ -384,7 +384,7 @@ class xt{
 				*/
 				if(!in_array($name, $this->caches)){
 					$this->createCache=true;
-					$this->appendText($node, '<![CDATA[<?php echo $xt->cache[\''.$name.'\'];?>]]>');
+					$this->appendText($node, '<![CDATA[<?php echo $xt->cache[\'obiekt'.$this->cache->count++.'\'];?>]]>');
 					
 					$this->cache[$name]=$value;
 				}else{
