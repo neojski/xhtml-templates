@@ -246,8 +246,6 @@ class getNode{
 			$match=$attribute;
 		}
 		
-		echo $match;
-		
 		if(!$not){
 			$this->type[]=$match;
 		}else{
