@@ -208,7 +208,7 @@ class getNode{
 		}
 	}
 	
-	private function g_attribute($attribute, $not){
+	private function g_attribute($attribute, $not=false){
 		preg_match('#\[(.*?|\#text)(?:([~^$*|]?)="([^"]+)")?\]#', $attribute, $match);
 		
 		if($match[1]=='#text'){ // magiczny atrybut oznaczający zawartość tekstową

@@ -37,13 +37,5 @@ class html /*extends xml*/{
 			}
 		}
 	}
-	/**
-	 * some html functions
-	 * for exapmle
-	 *  form
-	 *  img
-	 *  input
-	 * look - css or js plugin
-	 */
 }
 ?>
