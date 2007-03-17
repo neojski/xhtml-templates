@@ -29,6 +29,12 @@ class dom{
 	public function load(){
 		$this->xml=new mydom();
 		
+		if(file_exists('../templates/'.$this->core->name.'.xc')){
+			$this->template=file_get_contents('../templates/'.$this->core->name.'.xc');
+		}else{
+			$this->template=file_get_contents($this->core->name);
+		}
+		
 		$this->check_encoding();
 		
 		/* usuń xmlns, które tymczasem psuje wszystko */
@@ -116,7 +122,7 @@ class dom{
 			'application/atom+xml'
 		);
 
-		if($this->debug){
+		if($this->core->debug){
 			echo '<pre><code>'.htmlspecialchars($this->xml->savexml()).'</code></pre>';
 		}elseif($mime==0){
 			return $this->xml->savexml();
@@ -241,7 +247,7 @@ class dom{
 		if($this->is_node($name)){
 			return $name;
 		}else{
-			$str=$this->getnode;
+			$str=$this->core->getnode;
 			if(!$parent){
 				$parent=$this->root;
 			}
@@ -256,6 +262,26 @@ class dom{
 			$nodes=$this->getNode($name, $parent, 0); // getNode($name.':first-of-type', $parent);
 			
 			return $nodes->item(0);
+		}
+	}
+	public function add($name, $value){
+		if($node=$this->getOneNode($name)){
+			if(is_array($value) && isset($value[0]) && is_array($value[0])){
+				//$node->removeAttribute('id');
+				$this->r($node, $value);
+			}elseif(is_array($value)){
+				$this->set($node, $value);
+			}elseif(is_string($value)){
+				$this->appendText($node, $value);
+			}elseif($this->is_node($value)){
+				$node->appendChild($value);
+			}elseif($value instanceof fragment){
+				$node->appendChild($value->s);
+			}else{
+				throw new xtException('Niepoprawny drugi parametr metody <code>add</code>: <code>'.htmlspecialchars(print_r($value, 1)).'</code>', E_WARNING);
+			}
+		}else{
+			return false;
 		}
 	}
 	
@@ -276,6 +302,199 @@ class dom{
 		}else{
 			return false;
 		}
+	}
+	
+	/**
+	 * nadawanie atrybutów obiektowi
+	 * arguemtny w tablicy lub jako kolejene parametry funkcji
+	 */
+	public function set($node, $attributes){
+		if($node=$this->getOneNode($node)){
+			foreach($attributes as $attribute => $value){
+				if($value!==false){
+					if($attribute!='#text'){
+						$node->setAttribute($attribute, $value);
+					}else{
+						$this->appendText($node, $value);
+					}
+				}
+				
+			}
+		}else{
+			return false;
+		}
+	}
+	
+	/**
+	 * tworzenie elementow dom
+	 * @param mixed object
+	 * @param string name
+	 * @param array attributes
+	 */
+	public function create($name, $str=0, $arguments=0){
+		$node=$this->xml->createElement($name);
+		if($str){
+			$this->appendText($node, $str);
+		}
+		if($arguments){
+			$this->set($node, $arguments);
+		}
+		return $node;
+	}
+	
+	/**
+	 * usuwanie obiektów
+	 * zwraca usuwane dziecko
+	 */
+	public function remove($name){
+		if($node=$this->getOneNode($name)){
+			return $node->parentNode->removeChild($node);
+		}else{
+			return false;
+		}
+	}
+	
+	/**
+	 * alias funkcji remove
+	 */
+	public function delete($name){
+		$this->remove($name);
+	}
+	
+	/**
+	 * tak jak domowa, nie obsługuje pętli
+	 * UWAGA!!! niekompatybilny z domowym!!!
+	 */
+	public function insertBefore($old, $new){
+		if($old=$this->getOneNode($old)){
+			if($this->is_node($new) && $this->is_node($old)){
+				$old->parentNode->insertBefore($new, $old);
+			}elseif($new=$this->text2html($new)){
+				$old->parentNode->insertBefore($new, $old);
+			}
+		}else{
+			return false;
+		}
+	}
+	
+	/**
+	 * jw, tylko dodwawanie po,
+	 * dodać sprawdzanie
+	 * && $this->is_node($old->nextSibling)
+	 */
+	public function insertAfter($old, $new){
+		if($old=$this->getOneNode($old)){
+			//if(!$this->is_node($new)){
+			//	$new=$this->text2html($new);
+			//}
+			
+			$fragment=$this->xml->createDocumentFragment();
+			$this->add($fragment, $new); # some problems with loop
+			
+			// jeśli jest ktoś za
+			if($this->is_node(nextSibling)){
+				$this->insertBefore($fragment, $old->nextSibling);
+			}else{
+			// jeśl nie ma nikogo za ;-)
+				$old->parentNode->appendChild($fragment);
+			}
+		}else{
+			return false;
+		}
+	}
+	
+	/**
+	 * clone - return new fragment
+	 */
+	public function clone_node($node, $remove_parent=0){
+		if($node=$this->getOneNode($node)){
+			$fragment=$this->fragment($this->savexml($node));
+			return $fragment;
+		}else{
+			return null;
+		}
+	}
+	
+	/**
+	 * something like
+	 * {if condition}
+	 *   object
+	 * {/if}
+	 *
+	 * if condition isn't true - delete object
+	 */
+	public function condition($condition, $object){
+		if($node=$this->getOneNode($object)){
+			if(!$condition){
+				$this->remove($node);
+			}
+		}
+	}
+	
+	/**
+	 * zwraca listę obiektów w formie domnodelist
+	 * @param mixed klasa
+	 * @param domnode parent
+	 * @param string tag_nane
+	 */
+	public function getElementsByClassName($class, $parent=0, $name=0){
+		if(!$parent){
+			$parent=$this->root;
+		}
+		if(!$name){
+			$name='*';
+		}
+		if(!is_array($class)){
+			$class=array($class);
+		}
+		$query = $name.'[';
+		foreach($class as $c){
+			$query.='contains(concat(" ", @class, " "), " '.$c.' ") and ';
+		}
+		$query=substr($query, 0, -4);
+		$query.=']';
+		$xpath = new DOMXPath($this->xml);
+		return $xpath->query($query, $parent);
+	}
+	
+	/**
+	 * getElementsByTagName, teoretycznie niepotrzebna
+	 */
+	public function getElementsByTagName($tag, $parent=0){
+		if(!$parent){
+			$parent=$this->root;
+		}
+		return $parent->getElementsByTagName($tag);
+	}
+	
+	/**
+	 * zwraca tag element o podanej nazwie
+	 */
+	public function getElementByTagName($tag, $parent=0, $count=0){
+		if(!$parent){
+			$parent=$this->root;
+		}
+		return $this->getElementsByTagName($tag, $parent)->item($count);
+	}
+	
+	/**
+	 * zwraca obiekt mając za parametr jego id
+	 * @param str object
+	 * @param object domnode 
+	 * @param str node name
+	 * @return object domnode
+	 */
+	public function getElementById($id, $parent=0, $node_name=0){
+		if(!$parent){
+			$parent=$this->root;
+		}
+		if(!$node_name){
+			$node_name='*';
+		}
+		$xpath = new DOMXPath($this->xml);
+		$query = './descendant-or-self::'.$node_name.'[@id="'.$id.'"]';
+		$entries = $xpath->query($query, $parent);
+		return $entries->item(0);
 	}
 }
 ?>

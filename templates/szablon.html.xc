@@ -11,7 +11,7 @@
   </ul>
   <div id="a">id a<?php echo $this->cache->values['obiekt1'];?></div>
   <div id="b">id b<?php echo $this->cache->values['obiekt2'];?></div>
-  <div id="c">id c</div>
+  <div id="c">id c<?php echo $this->cache->values['obiekt3'];?></div>
   
   <strong id="test">aaa</strong>
   </body>

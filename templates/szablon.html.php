@@ -1,1 +1,1 @@
-a:2:{s:2:"#a";s:7:"obiekt1";s:2:"#b";s:7:"obiekt2";}
+a:3:{s:2:"#a";s:7:"obiekt1";s:2:"#b";s:7:"obiekt2";s:2:"#c";s:7:"obiekt3";}

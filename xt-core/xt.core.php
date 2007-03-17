@@ -31,6 +31,7 @@ define('ATOM', 6);
 class xt{
 	private $core=array('fragment', 'getnode', 'switcher', 'dom', 'cache');
 	public function __construct($file=0){
+		$this->start_time=$this->microtime_float();
 		$this->find_plugins();
 		$this->debug=false;
 		$this->getnode_method=2;
@@ -38,6 +39,11 @@ class xt{
 		if($file){
 			$this->load($file);
 		}
+	}
+	
+	public function microtime_float(){
+		list($usec, $sec) = explode(" ", microtime());
+		return ((float)$usec + (float)$sec);
 	}
 	
 	private function find_plugins(){
@@ -106,6 +112,9 @@ class xt{
 			if(isset($this->cache->objects[$name])){
 				$index=$this->cache->objects[$name];
 				$this->cache->values[$index]=$value;
+			}else{
+				echo 'nowy!!';
+				$this->cache->add($name, $value);
 			}
 		}
 		/*	if(is_array($value) && isset($value[0]) && is_array($value[0])){
@@ -137,6 +146,7 @@ class xt{
 	
 	public function display(){
 		eval('?>'.$this->cache->code.'<?php');
+		echo '<p>Czas wykonywania skryptu to '.($this->microtime_float()-$this->start_time).'s</p>';
 	}
 	
 	/**
@@ -193,198 +203,7 @@ class xt{
 		}
 	}
 	
-	/**
-	 * nadawanie atrybutów obiektowi
-	 * arguemtny w tablicy lub jako kolejene parametry funkcji
-	 */
-	public function set($node, $attributes){
-		if($node=$this->getOneNode($node)){
-			foreach($attributes as $attribute => $value){
-				if($value!==false){
-					if($attribute!='#text'){
-						$node->setAttribute($attribute, $value);
-					}else{
-						$this->appendText($node, $value);
-					}
-				}
-				
-			}
-		}else{
-			return false;
-		}
-	}
 	
-	/**
-	 * tworzenie elementow dom
-	 * @param mixed object
-	 * @param string name
-	 * @param array attributes
-	 */
-	public function create($name, $str=0, $arguments=0){
-		$node=$this->xml->createElement($name);
-		if($str){
-			$this->appendText($node, $str);
-		}
-		if($arguments){
-			$this->set($node, $arguments);
-		}
-		return $node;
-	}
-	
-	/**
-	 * usuwanie obiektów
-	 * zwraca usuwane dziecko
-	 */
-	public function remove($name){
-		if($node=$this->getOneNode($name)){
-			return $node->parentNode->removeChild($node);
-		}else{
-			return false;
-		}
-	}
-	
-	/**
-	 * alias funkcji remove
-	 */
-	public function delete($name){
-		$this->remove($name);
-	}
-	
-	/**
-	 * tak jak domowa, nie obsługuje pętli
-	 * UWAGA!!! niekompatybilny z domowym!!!
-	 */
-	public function insertBefore($old, $new){
-		if($old=$this->getOneNode($old)){
-			if($this->is_node($new) && $this->is_node($old)){
-				$old->parentNode->insertBefore($new, $old);
-			}elseif($new=$this->text2html($new)){
-				$old->parentNode->insertBefore($new, $old);
-			}
-		}else{
-			return false;
-		}
-	}
-	
-	/**
-	 * jw, tylko dodwawanie po,
-	 * dodać sprawdzanie
-	 * && $this->is_node($old->nextSibling)
-	 */
-	public function insertAfter($old, $new){
-		if($old=$this->getOneNode($old)){
-			//if(!$this->is_node($new)){
-			//	$new=$this->text2html($new);
-			//}
-			
-			$fragment=$this->xml->createDocumentFragment();
-			$this->add($fragment, $new); # some problems with loop
-			
-			// jeśli jest ktoś za
-			if($this->is_node(nextSibling)){
-				$this->insertBefore($fragment, $old->nextSibling);
-			}else{
-			// jeśl nie ma nikogo za ;-)
-				$old->parentNode->appendChild($fragment);
-			}
-		}else{
-			return false;
-		}
-	}
-	
-	/**
-	 * clone - return new fragment
-	 */
-	public function clone_node($node, $remove_parent=0){
-		if($node=$this->getOneNode($node)){
-			$fragment=$this->fragment($this->savexml($node));
-			return $fragment;
-		}else{
-			return null;
-		}
-	}
-	
-	/**
-	 * something like
-	 * {if condition}
-	 *   object
-	 * {/if}
-	 *
-	 * if condition isn't true - delete object
-	 */
-	public function condition($condition, $object){
-		if($node=$this->getOneNode($object)){
-			if(!$condition){
-				$this->remove($node);
-			}
-		}
-	}
-	
-	/**
-	 * zwraca listę obiektów w formie domnodelist
-	 * @param mixed klasa
-	 * @param domnode parent
-	 * @param string tag_nane
-	 */
-	public function getElementsByClassName($class, $parent=0, $name=0){
-		if(!$parent){
-			$parent=$this->root;
-		}
-		if(!$name){
-			$name='*';
-		}
-		if(!is_array($class)){
-			$class=array($class);
-		}
-		$query = $name.'[';
-		foreach($class as $c){
-			$query.='contains(concat(" ", @class, " "), " '.$c.' ") and ';
-		}
-		$query=substr($query, 0, -4);
-		$query.=']';
-		$xpath = new DOMXPath($this->xml);
-		return $xpath->query($query, $parent);
-	}
-	
-	/**
-	 * getElementsByTagName, teoretycznie niepotrzebna
-	 */
-	public function getElementsByTagName($tag, $parent=0){
-		if(!$parent){
-			$parent=$this->root;
-		}
-		return $parent->getElementsByTagName($tag);
-	}
-	
-	/**
-	 * zwraca tag element o podanej nazwie
-	 */
-	public function getElementByTagName($tag, $parent=0, $count=0){
-		if(!$parent){
-			$parent=$this->root;
-		}
-		return $this->getElementsByTagName($tag, $parent)->item($count);
-	}
-	
-	/**
-	 * zwraca obiekt mając za parametr jego id
-	 * @param str object
-	 * @param object domnode 
-	 * @param str node name
-	 * @return object domnode
-	 */
-	public function getElementById($id, $parent=0, $node_name=0){
-		if(!$parent){
-			$parent=$this->root;
-		}
-		if(!$node_name){
-			$node_name='*';
-		}
-		$xpath = new DOMXPath($this->xml);
-		$query = './descendant-or-self::'.$node_name.'[@id="'.$id.'"]';
-		$entries = $xpath->query($query, $parent);
-		return $entries->item(0);
-	}
 	
 	/**
 	 * plugins which needs special inteface

@@ -33,6 +33,8 @@ class cache{
 		if(file_exists('../templates/'.$this->core->name.'.xc')){
 			$this->code=file_get_contents('../templates/'.$this->core->name.'.xc');
 			$this->objects=unserialize(file_get_contents('../templates/'.$this->core->name.'.php'));
+			
+			$this->count=count($this->objects);
 		}else{
 			echo 'nie';
 		}
@@ -40,13 +42,19 @@ class cache{
 	
 	public function add($css, $value){
 		$this->createCache=true;
-		$this->core->dom->add($css, '<?php /*kod php*/'.$value.'?>');
-		$this->objects[]=array($css, 'obiekt');
+		$this->core->dom->add($css, '<?php echo $this->cache->values[\'obiekt'.++$this->count.'\'];?>');
+		$this->objects[$css]='obiekt'.$this->count;
 	}
 	
 	public function __destruct(){
-		if($this->createCache){
-			file_put_contents($this->core->filename, $this->core->dom->savexml());
+		if($this->createCache){ echo $this->core->dom->display();
+			// zapisz szablon
+			file_put_contents(dirname(__FILE__).'/../templates/'.$this->core->name.'.xc', $this->core->dom->display());
+			
+			// zapisz obiekty
+			file_put_contents(dirname(__FILE__).'/../templates/'.$this->core->name.'.php',serialize($this->objects));
 		}
+		
+		print_r($this->objects);
 	}
 }

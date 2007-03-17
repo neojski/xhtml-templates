@@ -14,9 +14,13 @@ include('../xt.class.php');
 try{
 	$xt=new xt('szablon.html');
 	
-	$xt->add('#a', 'test');
+	date_default_timezone_set('Europe/Warsaw');
 	
-	$xt->add('#b', 'test');
+	$xt->add('#a', date('U'));
+	
+	$xt->add('#b', mt_rand(0,100));
+	
+	$xt->add('#c', 'test');
 	
 	$xt->display(1);
 	

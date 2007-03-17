@@ -27,8 +27,8 @@ class getNode{
 		$this->core=$xt;
 		$this->debug=0;
 
-		$this->xml=$xt->xml;
-		$this->root=$xt->root;
+		$this->xml=$xt->dom->xml;
+		$this->root=$xt->dom->root;
 		
 		$this->method=$xt->getnode_method;
 	}
