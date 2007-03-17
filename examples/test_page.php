@@ -24,6 +24,16 @@ try{
 	
 	$xt->add('#c', 'dddeee');
 	
+	$xt->add('html body', 'test');
+	$xt->add('html body *', 'test');
+	
+	$xt->add('html *', 'aaa');
+		
+	$xt->add('title', 'test');
+	
+	
+	$xt->add('html * *', mt_rand(0,100));
+	
 	$xt->display(1);
 	
 	

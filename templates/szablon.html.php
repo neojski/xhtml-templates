@@ -1,1 +1,1 @@
-a:4:{s:2:"#a";s:7:"obiekt1";s:2:"#b";s:7:"obiekt2";s:2:"#c";s:7:"obiekt3";s:2:"#d";s:7:"obiekt4";}
+a:9:{s:2:"#a";s:7:"obiekt1";s:2:"#b";s:7:"obiekt2";s:2:"#c";s:7:"obiekt3";s:2:"#d";s:7:"obiekt4";s:9:"html body";s:7:"obiekt5";s:11:"html body *";s:7:"obiekt6";s:6:"html *";s:7:"obiekt7";s:8:"html * *";s:7:"obiekt8";s:5:"title";s:7:"obiekt9";}

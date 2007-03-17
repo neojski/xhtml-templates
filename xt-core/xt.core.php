@@ -35,6 +35,8 @@ class xt{
 		$this->find_plugins();
 		$this->debug=false;
 		$this->getnode_method=2;
+		
+		$this->templates=dirname(__FILE__).'/../templates';
 
 		if($file){
 			$this->load($file);
@@ -95,8 +97,8 @@ class xt{
 			$this->name=basename($file);
 			$this->template=file_get_contents($file);
 			
-			if(file_exists(dirname(__FILE__).'/../templates/'.$this->name.'.xc')){
-				$this->cached=file_get_contents(dirname(__FILE__).'/../templates/'.$this->name.'.xc');
+			if(file_exists($this->templates.'/'.$this->template.$this->name.'.xc')){
+				$this->cached=file_get_contents($this->templates.'/'.$this->name.'.xc');
 				
 			}
 		}else{
@@ -108,14 +110,22 @@ class xt{
 	 * głowna funkcja dodająca wartości/parametry, obsługująca pętle
 	 */
 	public function add($name, $value){
-		//if(is_string($value) || is_int($value)){
+		if(is_string($value) || is_int($value)){
 			if(isset($this->cache->objects[$name])){
 				$index=$this->cache->objects[$name];
 				$this->cache->values[$index]=$value;
 			}else{
-				echo 'nowy!!';
 				$this->cache->add($name, $value);
 			}
+		}elseif($this->dom->is_node($value)){
+			$value=$this->dom->xml->savexml($this->dom->xml->importNode($value, true));
+			if(isset($this->cache->objects[$name])){
+				$index=$this->cache->objects[$name];
+				$this->cache->values[$index]=$value;
+			}else{
+				$this->cache->add($name, $value);
+			}
+		}
 		//}
 		/*elseif($this->dom->is_node($value)){ echo 'aaa';
 			if(isset($this->cache->objects[$name])){

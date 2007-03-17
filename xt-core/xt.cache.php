@@ -31,8 +31,8 @@ class cache{
 	
 	public function load(){
 		if(file_exists('../templates/'.$this->core->name.'.xc')){
-			$this->code=file_get_contents('../templates/'.$this->core->name.'.xc');
-			$this->objects=unserialize(file_get_contents('../templates/'.$this->core->name.'.php'));
+			$this->code=file_get_contents($this->core->templates.'/'.$this->core->name.'.xc');
+			$this->objects=unserialize(file_get_contents($this->core->templates.'/'.$this->core->name.'.php'));
 			
 			$this->count=count($this->objects);
 		}else{
@@ -47,12 +47,12 @@ class cache{
 	}
 	
 	public function __destruct(){
-		if($this->createCache){ echo $this->core->dom->display();
+		if($this->createCache){
 			// zapisz szablon
-			file_put_contents(dirname(__FILE__).'/../templates/'.$this->core->name.'.xc', $this->core->dom->display());
+			file_put_contents($this->core->templates.'/'.$this->core->name.'.xc', $this->core->dom->display());
 			
 			// zapisz obiekty
-			file_put_contents(dirname(__FILE__).'/../templates/'.$this->core->name.'.php',serialize($this->objects));
+			file_put_contents($this->core->templates.'/'.$this->core->name.'.php',serialize($this->objects));
 		}
 	}
 }

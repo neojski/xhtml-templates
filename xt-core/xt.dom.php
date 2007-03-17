@@ -23,14 +23,16 @@
 class dom{
 	public function __construct(&$xt){
 		$this->core=$xt;
-		$this->load();
+		$this->xml=new mydom();
+	}
+	
+	public function is_node($node){
+		return substr(print_r($node,true),0,3)==='DOM';
 	}
 	
 	public function load(){
-		$this->xml=new mydom();
-		
-		if(file_exists('../templates/'.$this->core->name.'.xc')){
-			$this->template=file_get_contents('../templates/'.$this->core->name.'.xc');
+		if(file_exists($this->core->templates.'/'.$this->core->name.'.xc')){
+			$this->template=file_get_contents($this->core->templates.'/'.$this->core->name.'.xc');
 		}else{
 			$this->template=file_get_contents($this->core->name);
 		}
@@ -110,9 +112,6 @@ class dom{
 		foreach($this->getElementsByClassName('remove_class') as $node){
 			$node->removeAttribute('class');
 		}
-		
-		//$this->add($this->body, '<p id="stopka">Ta strona została wygenerowana właśnie dzięki xt. Czas wykonywania skryptu to '.($this->microtime_float()-$this->start_time).'s</p>');
-		
 		$mime_tab=array(
 			2 => 'application/xhtml+xml',
 			'text/html',
@@ -189,9 +188,7 @@ class dom{
 	 * @param mixed
 	 * @return bool is_dom_object
 	 */
-	public function is_node($node){
-		return substr(print_r($node,true),0,3)==='DOM';
-	}
+	
 	
 	/**
 	 * dodanie zawartości tekstowej obiektowi
@@ -265,6 +262,9 @@ class dom{
 		}
 	}
 	public function add($name, $value){
+		if(!isset($this->template)){
+			$this->load();
+		}
 		if($node=$this->getOneNode($name)){
 			if(is_array($value) && isset($value[0]) && is_array($value[0])){
 				//$node->removeAttribute('id');
