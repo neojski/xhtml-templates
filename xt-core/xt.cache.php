@@ -31,6 +31,7 @@ class cache{
 	
 	public function load(){
 		if(file_exists('../templates/'.$this->core->name.'.xc')){
+			$this->code=file_get_contents('../templates/'.$this->core->name.'.xc');
 			$this->objects=unserialize(file_get_contents('../templates/'.$this->core->name.'.php'));
 		}else{
 			echo 'nie';

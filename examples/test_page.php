@@ -16,6 +16,8 @@ try{
 	
 	$xt->add('#a', 'test');
 	
+	$xt->add('#b', 'test');
+	
 	$xt->display(1);
 	
 	

@@ -104,7 +104,8 @@ class xt{
 	public function add($name, $value){
 		if(is_string($name)){
 			if(isset($this->cache->objects[$name])){
-				$this->cache->values[$name]=$value;
+				$index=$this->cache->objects[$name];
+				$this->cache->values[$index]=$value;
 			}
 		}
 		/*	if(is_array($value) && isset($value[0]) && is_array($value[0])){
@@ -132,6 +133,10 @@ class xt{
 		}else{
 			return false;
 		}*/
+	}
+	
+	public function display(){
+		eval('?>'.$this->cache->code.'<?php');
 	}
 	
 	/**
