@@ -16,7 +16,7 @@ try{
 	
 	$xt->add('#a', 'test');
 	
-	$xt->display(3);
+	$xt->display(1);
 	
 	
 }catch(xtException $e){
