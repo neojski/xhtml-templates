@@ -108,7 +108,7 @@ class xt{
 	 * głowna funkcja dodająca wartości/parametry, obsługująca pętle
 	 */
 	public function add($name, $value){
-		if(is_string($name)){
+		//if(is_string($value) || is_int($value)){
 			if(isset($this->cache->objects[$name])){
 				$index=$this->cache->objects[$name];
 				$this->cache->values[$index]=$value;
@@ -116,7 +116,18 @@ class xt{
 				echo 'nowy!!';
 				$this->cache->add($name, $value);
 			}
-		}
+		//}
+		/*elseif($this->dom->is_node($value)){ echo 'aaa';
+			if(isset($this->cache->objects[$name])){
+				$value=domdocument::savexml($value);
+				
+				$index=$this->cache->objects[$name];
+				$this->cache->values[$index]=$value;
+			}else{
+				echo 'nowy!!';
+				$this->cache->add($name, $value);
+			}
+		}*/
 		/*	if(is_array($value) && isset($value[0]) && is_array($value[0])){
 				//$node->removeAttribute('id');
 				$this->r($node, $value);

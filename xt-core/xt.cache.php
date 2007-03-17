@@ -54,7 +54,5 @@ class cache{
 			// zapisz obiekty
 			file_put_contents(dirname(__FILE__).'/../templates/'.$this->core->name.'.php',serialize($this->objects));
 		}
-		
-		print_r($this->objects);
 	}
 }

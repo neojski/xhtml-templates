@@ -22,6 +22,8 @@ try{
 	
 	$xt->add('#c', 'test');
 	
+	$xt->add('#c', 'dddeee');
+	
 	$xt->display(1);
 	
 	
