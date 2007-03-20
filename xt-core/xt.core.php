@@ -126,18 +126,6 @@ class xt{
 				$this->cache->add($name, $value);
 			}
 		}
-		//}
-		/*elseif($this->dom->is_node($value)){ echo 'aaa';
-			if(isset($this->cache->objects[$name])){
-				$value=domdocument::savexml($value);
-				
-				$index=$this->cache->objects[$name];
-				$this->cache->values[$index]=$value;
-			}else{
-				echo 'nowy!!';
-				$this->cache->add($name, $value);
-			}
-		}*/
 		/*	if(is_array($value) && isset($value[0]) && is_array($value[0])){
 				//$node->removeAttribute('id');
 				$this->r($node, $value);

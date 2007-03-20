@@ -48,8 +48,12 @@ class cache{
 	
 	public function __destruct(){
 		if($this->createCache){
+			$header='<?php /*'."\n".
+			$header.='Cache szablonu systemu xt. Zbudowano '.date(DATE_RFC822);
+			$header.="\n".'*/ ?>';
+		
 			// zapisz szablon
-			file_put_contents($this->core->templates.'/'.$this->core->name.'.xc', $this->core->dom->display());
+			file_put_contents($this->core->templates.'/'.$this->core->name.'.xc', $header.$this->core->dom->display());
 			
 			// zapisz obiekty
 			file_put_contents($this->core->templates.'/'.$this->core->name.'.php',serialize($this->objects));
