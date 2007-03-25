@@ -113,7 +113,11 @@ class xt{
 		if(is_string($value) || is_int($value)){
 			if(isset($this->cache->objects[$name])){
 				$index=$this->cache->objects[$name];
-				$this->cache->values[$index]=$value;
+				if(!isset($this->cache->values[$index])){
+					$this->cache->values[$index]=$value;
+				}else{
+					$this->cache->values[$index].=$value;
+				}
 			}else{
 				$this->cache->add($name, $value);
 			}
@@ -154,8 +158,10 @@ class xt{
 	}
 	
 	public function display(){
-		eval('?>'.$this->cache->code.'<?php');
-		echo '<p>Czas wykonywania skryptu to '.($this->microtime_float()-$this->start_time).'s</p>';
+		if(!$this->cache->createCache){
+			eval('?>'.$this->cache->code.'<?php');
+			echo '<p>Czas wykonywania skryptu to '.($this->microtime_float()-$this->start_time).'s</p>';
+		}
 	}
 	
 	/**

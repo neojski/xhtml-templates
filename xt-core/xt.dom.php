@@ -31,11 +31,11 @@ class dom{
 	}
 	
 	public function load(){
-		if(file_exists($this->core->templates.'/'.$this->core->name.'.xc')){
-			$this->template=file_get_contents($this->core->templates.'/'.$this->core->name.'.xc');
-		}else{
+		//if(file_exists($this->core->templates.'/'.$this->core->name.'.xc')){
+		//	$this->template=file_get_contents($this->core->templates.'/'.$this->core->name.'.xc');
+		//}else{
 			$this->template=file_get_contents($this->core->name);
-		}
+		//}
 		
 		$this->check_encoding();
 		
@@ -241,6 +241,9 @@ class dom{
 	 * @return null / object domnode
 	 */
 	public function getnode($name, $parent=0, $count=false){
+		if(!isset($this->template)){
+			$this->load();
+		}
 		if($this->is_node($name)){
 			return $name;
 		}else{

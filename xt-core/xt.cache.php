@@ -26,8 +26,27 @@ class cache{
 		$this->createCache=false;
 		$this->objects=array();
 		
+		$this->references=array();
+		
 		$this->load();
 	}
+	/*
+		references  (tablica) zapisywane są
+			[nazwa_obiektu] => nazwa_w_xt_cache
+			
+			np.
+			
+			[Object id #10] => obiekt3
+			[Object id #13] => obiekt3
+			
+		objects (tablica) zawiera:
+			[odwołanie_css_do_obiektu] => nazwa_w_xt_cache
+			
+			np.
+			
+			[html > body] => obiekt3
+			[html body] => obiekt3
+	*/
 	
 	public function load(){
 		if(file_exists('../templates/'.$this->core->name.'.xc')){
@@ -36,27 +55,42 @@ class cache{
 			
 			$this->count=count($this->objects);
 		}else{
-			echo 'nie';
+			echo '<p>Plik cache nie istnieje, prawdopodobie zostanie utworzony.</p>';
 		}
 	}
 	
 	public function add($css, $value){
 		$this->createCache=true;
-		$this->core->dom->add($css, '<?php echo $this->cache->values[\'obiekt'.++$this->count.'\'];?>');
-		$this->objects[$css]='obiekt'.$this->count;
+		
+		$node=$this->core->dom->getOneNode($css);
+		
+		if(!isset($this->references[(string)$node])){
+			$name='obiekt'.++$this->count;
+			$this->references[(string)$node]=$name;
+			$this->core->dom->add($node, '<?php echo $this->cache->values[\''.$name.'\'];?>');
+		}else{
+			$name=$this->references[(string)$node];
+		}
+		
+		
+		
+		$this->objects[$css]=$name;
 	}
 	
 	public function __destruct(){
 		if($this->createCache){
-			$header='<?php /*'."\n".
-			$header.='Cache szablonu systemu xt. Zbudowano '.date(DATE_RFC822);
+			echo '<p>Tworzenie pliku cache...</p>';
+			$header='<?php /*';
+			$header.="\n".'Cache szablonu systemu xt. Zbudowano '.date(DATE_RFC822);
 			$header.="\n".'*/ ?>';
 		
 			// zapisz szablon
-			file_put_contents($this->core->templates.'/'.$this->core->name.'.xc', $header.$this->core->dom->display());
-			
+			if(file_put_contents($this->core->templates.'/'.$this->core->name.'.xc', $header.$this->core->dom->display()) &&
 			// zapisz obiekty
-			file_put_contents($this->core->templates.'/'.$this->core->name.'.php',serialize($this->objects));
+			file_put_contents($this->core->templates.'/'.$this->core->name.'.php',serialize($this->objects))){
+				echo '<p>Utworzono plik cache</p>';
+			}
+			
 		}
 	}
 }

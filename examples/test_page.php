@@ -27,6 +27,13 @@ try{
 	$xt->add('html body', 'test');
 	$xt->add('html body *', 'test');
 	
+	$xt->add('html body *', 'test');
+	$xt->add('html body *', 'test');
+	$xt->add('html body *', 'test');
+	$xt->add('html body *', 'test');
+	
+	$xt->add('html > body *', 'test');
+	
 	$xt->add('html *', 'aaa');
 		
 	$xt->add('title', 'test');
@@ -35,8 +42,6 @@ try{
 	$xt->add('html * *', mt_rand(0,100));
 	
 	$xt->display(1);
-	
-	
 }catch(xtException $e){
 	echo $e;
 }
