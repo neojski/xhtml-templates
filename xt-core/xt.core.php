@@ -30,6 +30,8 @@ define('RSS', 5);
 define('ATOM', 6);
 
 define('STRING', 1);
+define('NAME', 2);
+define('ATTRIBUTES', 3);
 class xt{
 	private $core=array('fragment', 'getnode', 'switcher', 'dom', 'cache');
 	
@@ -141,7 +143,7 @@ class xt{
 					$this->cache->values[$index]['string'].=$value;
 				}
 			}else{
-				echo '<p>Używam add z cache, bo nie znalazłem obiektu <code>'.$name.'</code> w <code>$cache->objects</code></p>';
+				echo '<p>Używam add z cache, bo nie znalazłem obiektu <code>'.$name.'</code> (ciąg) w <code>$cache->objects</code></p>';
 				$this->cache->add($name, STRING);
 			}
 		}/*elseif($this->dom->is_node($value)){
@@ -180,18 +182,18 @@ class xt{
 		}*/
 	}
 	
-	public function set($css, $attributes){
-		if(is_string($attributes) || is_int($attributes)){
-			if(isset($this->cache->references[$name])){
+	public function set($name, $attributes){
+		if(is_array($attributes)){
+			if(isset($this->cache->instructions[$name][ATTRIBUTES])){
 				$index=$this->cache->references[$name];
-				if(!isset($this->cache->values[$index])){
-					$this->cache->values[$index]=$value;
+				if(!isset($this->cache->values[$index]['attributes'])){
+					$this->cache->values[$index]['attributes']=$attributes;
 				}else{
-					$this->cache->values[$index].=$value;
+					$this->cache->values[$index]['attributes'].=$attributes;
 				}
 			}else{
-				echo '<p>Używam add z cache, bo nie znalazłem obiektu <code>'.$name.'</code> w <code>$cache->objects</code></p>';
-				$this->cache->add($name, STRING);
+				echo '<p>Używam add z cache, bo nie znalazłem obiektu <code>'.$name.'</code> (atrybut) w <code>$cache->objects</code></p>';
+				$this->cache->add($name, ATTRIBUTES);
 			}
 		}
 	}

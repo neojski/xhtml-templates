@@ -59,6 +59,8 @@ class cache{
 		$this->create=true;
 		if($value==STRING){
 			$this->instructions[$css][STRING]=true;
+		}elseif($value==ATTRIBUTES){
+			$this->instructions[$css][ATTRIBUTES]=true;
 		}
 		
 		/*$node=$this->core->dom->getOneNode($css);
@@ -84,14 +86,27 @@ class cache{
 			if(!isset($this->references[$css])){
 				$this->references[$css]=$node->name;
 			}
-			
 			foreach($value as $k => $v){
-				switch($v){
+				switch($k){
 					case STRING:
-						if(!isset($node->string)){
+						if(!isset($node->xt[STRING])){
 							$this->core->dom->appendText($node,'<?php echo $this->cache->values[\''.$node->name.'\'][\'string\']; ?>');
-							$node->string=true;
+							$node->xt[STRING]=true;
 						}
+						break;
+					case ATTRIBUTES:
+						/* zżera stare atrybuty */
+						if(!isset($node->xt[ATTRIBUTES])){
+							if($node->xt[NAME]){
+								$name='$this->cache->values[\''.$node->name.'\'][\'name\']';
+							}else{
+								$name=$node->nodeName;
+							}
+							$this->core->dom->appendText($node, '<?php echo \''.$name.'\'; foreach($this->cache->values[\''.$node->name.'\'][\'attributes\'] as $k => $v){ echo $k.\'="\'.$v.\'"\';} ?>');
+							$node->xt[ATTRIBUTES]=true;
+							$node->xt['delete']=true;
+						}
+						break;
 				}
 			}
 		}
@@ -100,10 +115,10 @@ class cache{
 	
 	public function __destruct(){
 		if($this->create){
-		
+			echo '<p>Tworzenie pliku cache...</p>';
 			$this->create();
 		
-			echo '<p>Tworzenie pliku cache...</p>';
+			
 			$header='<?php /*';
 			$header.="\n".'Cache szablonu systemu xt. Zbudowano '.date(DATE_RFC822);
 			$header.="\n".'*/ ?>';

@@ -22,7 +22,7 @@ try{
 		
 	$xt->add('title', 'test');
 	
-	$xt->set('#a', array('style'=>'color:red'));
+	$xt->set('#a', array('style'=>'color:red', 'atrybut'=>'wartość'));
 	
 	
 	$xt->add('html * *', mt_rand(0,100));

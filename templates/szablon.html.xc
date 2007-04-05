@@ -1,5 +1,5 @@
 <?php /*
-Cache szablonu systemu xt. Zbudowano Thu, 05 Apr 2007 20:55:39 CEST
+Cache szablonu systemu xt. Zbudowano Thu, 05 Apr 2007 21:19:57 CEST
 */ ?><?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -11,7 +11,7 @@ Cache szablonu systemu xt. Zbudowano Thu, 05 Apr 2007 20:55:39 CEST
   <ul id="lista">
   	<li>podpunkt</li>
   </ul>
-  <div id="a">id a<?php echo $this->cache->values['object1']['string']; ?></div>
+  <div id="a">id a<?php echo $this->cache->values['object1']['string']; ?><?php echo 'div'; foreach($this->cache->values['object1']['attributes'] as $k => $v){ echo $k.'="'.$v.'"';} ?></div>
   <div id="b">id b</div>
   <div id="c">id c</div>
   <div id="d">id d</div>
