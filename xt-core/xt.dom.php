@@ -30,12 +30,8 @@ class dom{
 		return substr(print_r($node,true),0,3)==='DOM';
 	}
 	
-	public function load(){
-		//if(file_exists($this->core->templates.'/'.$this->core->name.'.xc')){
-		//	$this->template=file_get_contents($this->core->templates.'/'.$this->core->name.'.xc');
-		//}else{
-			$this->template=file_get_contents($this->core->name);
-		//}
+	public function load($template){
+		$this->template=file_get_contents($template);
 		
 		$this->check_encoding();
 		

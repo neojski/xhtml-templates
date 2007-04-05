@@ -30,16 +30,44 @@ define('RSS', 5);
 define('ATOM', 6);
 class xt{
 	private $core=array('fragment', 'getnode', 'switcher', 'dom', 'cache');
-	public function __construct($file=0){
+	
+	public $name, $fullname;
+	
+	public function __construct($file){
 		$this->start_time=$this->microtime_float();
+		
+		
 		$this->find_plugins();
 		$this->debug=false;
 		$this->getnode_method=2;
 		
-		$this->templates=dirname(__FILE__).'/../templates';
+		
+		$this->templates=dirname($_SERVER['PHP_SELF']).'/../templates';
 
 		if($file){
 			$this->load($file);
+		}
+	}
+	
+	/**
+	 * @param str filename/template
+	 */
+	public function load($file){
+		if(file_exists($file)){
+			$this->name=basename($file);
+			
+			$this->fullname=dirname($_SERVER['PHP_SELF']).'/'.$file;
+			
+			var_dump(dirname($_SERVER['PHP_SELF']));
+			
+			$this->template=file_get_contents($file);
+			
+			if(file_exists($this->templates.'/'.$this->template.$this->name.'.xc')){
+				$this->cached=file_get_contents($this->templates.'/'.$this->name.'.xc');
+				
+			}
+		}else{
+			throw new xtException('Plik szablonu <code>'.htmlspecialchars($file).'</code> nie istnieje', E_ERROR);
 		}
 	}
 	
@@ -59,6 +87,15 @@ class xt{
 	 * include plugins
 	 */
 	public function __get($name){
+		if($name=='dom'){
+			require_once('xt.dom.php');
+			$this->dom=new dom($xt);
+			$this->dom->load($this->fullname);
+			
+			
+			return $this->dom;
+		}
+		
 		if(in_array($name, $this->plugins)){
 			if(!isset($this->$name)){
 				require_once('../xt-plugins/xt.'.$name.'.php');
@@ -89,22 +126,7 @@ class xt{
 		}
 	}
 	
-	/**
-	 * @param str filename/template
-	 */
-	public function load($file){
-		if(file_exists($file)){
-			$this->name=basename($file);
-			$this->template=file_get_contents($file);
-			
-			if(file_exists($this->templates.'/'.$this->template.$this->name.'.xc')){
-				$this->cached=file_get_contents($this->templates.'/'.$this->name.'.xc');
-				
-			}
-		}else{
-			throw new xtException('Plik szablonu <code>'.htmlspecialchars($file).'</code> nie istnieje', E_ERROR);
-		}
-	}
+	
 	
 	/**
 	 * głowna funkcja dodająca wartości/parametry, obsługująca pętle
@@ -119,9 +141,10 @@ class xt{
 					$this->cache->values[$index].=$value;
 				}
 			}else{
+				echo '<p>używam add z cache</p>';
 				$this->cache->add($name, $value);
 			}
-		}elseif($this->dom->is_node($value)){
+		}/*elseif($this->dom->is_node($value)){
 			$value=$this->dom->xml->savexml($this->dom->xml->importNode($value, true));
 			if(isset($this->cache->objects[$name])){
 				$index=$this->cache->objects[$name];
@@ -130,7 +153,7 @@ class xt{
 				$this->cache->add($name, $value);
 			}
 		}
-		/*	if(is_array($value) && isset($value[0]) && is_array($value[0])){
+			if(is_array($value) && isset($value[0]) && is_array($value[0])){
 				//$node->removeAttribute('id');
 				$this->r($node, $value);
 			}elseif(is_array($value)){
@@ -158,9 +181,11 @@ class xt{
 	}
 	
 	public function display(){
-		if(!$this->cache->createCache){
+		if(!$this->cache->create){
 			eval('?>'.$this->cache->code.'<?php');
 			echo '<p>Czas wykonywania skryptu to '.($this->microtime_float()-$this->start_time).'s</p>';
+		}else{
+			echo '<p>Tworzę cache, odśwież, aby zobaczyć efekt</p>';
 		}
 	}
 	

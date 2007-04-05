@@ -21,15 +21,14 @@
  */
 
 class cache{
-	public function __construct(&$xt){
-		$this->core=$xt;
-		$this->createCache=false;
-		$this->objects=array();
+	private
+		$references,
+		$instructions;
 		
-		$this->references=array();
-		
-		$this->load();
-	}
+	public
+		$create=false,
+		$objects;
+	
 	/*
 		references  (tablica) zapisywane są
 			[nazwa_obiektu] => nazwa_w_xt_cache
@@ -46,23 +45,46 @@ class cache{
 			
 			[html > body] => obiekt3
 			[html body] => obiekt3
+			
+		make_cache (tablica)
+			[odwołanie_css_do_obiektu] => array( co_z_nim_zrobić )
+			
+			np.
+			
+			[html > body] => array ( 'pętla' );
+			
 	*/
 	
+	/*
+		plik:
+			nazwa.xc - plik cache
+			nazwa.php - plik zawierający obiekty
+	*/
+	
+	public function __construct(&$xt){
+		$this->core=$xt;
+		$this->load();
+	}
+	
+	
 	public function load(){
-		if(file_exists('../templates/'.$this->core->name.'.xc')){
+		if(file_exists($this->core->templates.'/'.$this->core->name.'.xc')){
+			echo 'plik jest';
 			$this->code=file_get_contents($this->core->templates.'/'.$this->core->name.'.xc');
 			$this->objects=unserialize(file_get_contents($this->core->templates.'/'.$this->core->name.'.php'));
 			
 			$this->count=count($this->objects);
 		}else{
-			echo '<p>Plik cache nie istnieje, prawdopodobie zostanie utworzony.</p>';
+			echo '<p>Plik cache nie istnieje.</p>';
 		}
 	}
 	
 	public function add($css, $value){
-		$this->createCache=true;
+		$this->create=true;
 		
-		$node=$this->core->dom->getOneNode($css);
+		$this->instructions[$css]['string']=true;
+		
+		/*$node=$this->core->dom->getOneNode($css);
 		
 		if(!isset($this->references[(string)$node])){
 			$name='obiekt'.++$this->count;
@@ -72,25 +94,41 @@ class cache{
 			$name=$this->references[(string)$node];
 		}
 		
-		
-		
-		$this->objects[$css]=$name;
+		$this->objects[$css]=$name;*/
+	}
+	
+	public function create(){
+		foreach($this->instructions as $css => $value){
+			//$node=$this->core->dom->getOneNode($css);
+			
+			/*foreach($value as $k => $v){
+				echo $k;
+			}*/
+		}
 	}
 	
 	public function __destruct(){
-		if($this->createCache){
+		if($this->create){
+		
+			$this->create();
+		
 			echo '<p>Tworzenie pliku cache...</p>';
 			$header='<?php /*';
 			$header.="\n".'Cache szablonu systemu xt. Zbudowano '.date(DATE_RFC822);
 			$header.="\n".'*/ ?>';
 		
 			// zapisz szablon
+			var_dump($this->core->dom);
 			if(file_put_contents($this->core->templates.'/'.$this->core->name.'.xc', $header.$this->core->dom->display()) &&
+			
 			// zapisz obiekty
 			file_put_contents($this->core->templates.'/'.$this->core->name.'.php',serialize($this->objects))){
 				echo '<p>Utworzono plik cache</p>';
 			}
 			
 		}
+		echo '<pre style="border:2px solid">Tablica $objects';
+		print_r($this->objects);
+		echo '</pre>';
 	}
 }

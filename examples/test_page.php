@@ -9,12 +9,14 @@
 	</ol>
 */
 
+date_default_timezone_set('Europe/Warsaw');
+
 include('../xt.class.php');
 
 try{
 	$xt=new xt('szablon.html');
 	
-	date_default_timezone_set('Europe/Warsaw');
+	
 	
 	$xt->add('#a', date('U'));
 	
