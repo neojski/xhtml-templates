@@ -19,32 +19,10 @@ try{
 	
 	
 	$xt->add('#a', 'test');
-	$xt->add('html #a', date('U'));
-	$xt->add('html body #a', date('U'));
-	$xt->add('#b', date('U'));
-	$xt->add('#c', date('U'));
-	$xt->add('#d', date('U'));
-	$xt->add('body sdfa fsda dsaf ds ds', date('U'));
-	
-	/**/$xt->add('#b', mt_rand(0,100));
-	
-	$xt->add('#c', 'test');
-	
-	$xt->add('#c', 'dddeee');
-	
-	$xt->add('html body', 'test');
-	$xt->add('html body *', 'test');
-	
-	$xt->add('html body *', 'test');
-	$xt->add('html body *', 'test');
-	$xt->add('html body *', 'test');
-	$xt->add('html body *', 'test');
-	
-	$xt->add('html > body *', 'test');
-	
-	$xt->add('html *', 'aaa');
 		
 	$xt->add('title', 'test');
+	
+	$xt->set('#a', array('style'=>'color:red'));
 	
 	
 	$xt->add('html * *', mt_rand(0,100));

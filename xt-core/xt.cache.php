@@ -21,13 +21,11 @@
  */
 
 class cache{
-	private
-		
-		$instructions;
 		
 	public
 		$references,
-		$create=false;
+		$create=false,
+		$instructions;
 	
 	/*
 		plik:
@@ -46,7 +44,7 @@ class cache{
 	*/
 	public function load(){
 		if(file_exists($this->core->templates.'/'.$this->core->name.'.xc') && file_exists($this->core->templates.'/'.$this->core->name.'.php') && file_exists($this->core->templates.'/'.$this->core->name.'.i')){
-			echo '<p>Pliki cache są</p>';
+			if($this->core->debug)echo '<p>Pliki cache są</p>';
 			$this->code=file_get_contents($this->core->templates.'/'.$this->core->name.'.xc');
 			$this->references=unserialize(file_get_contents($this->core->templates.'/'.$this->core->name.'.php'));
 			$this->instructions=unserialize(file_get_contents($this->core->templates.'/'.$this->core->name.'.i'));
@@ -60,7 +58,7 @@ class cache{
 	public function add($css, $value){
 		$this->create=true;
 		if($value==STRING){
-			$this->instructions[$css]['string']=true;
+			$this->instructions[$css][STRING]=true;
 		}
 		
 		/*$node=$this->core->dom->getOneNode($css);
@@ -91,7 +89,7 @@ class cache{
 				switch($v){
 					case STRING:
 						if(!isset($node->string)){
-							$this->core->dom->appendText($node,'<?php echo $this->cache->values[\''.$node->name.'\']; ?>');
+							$this->core->dom->appendText($node,'<?php echo $this->cache->values[\''.$node->name.'\'][\'string\']; ?>');
 							$node->string=true;
 						}
 				}
@@ -116,7 +114,7 @@ class cache{
 			// zapisz referencje obiektów
 			file_put_contents($this->core->templates.'/'.$this->core->name.'.php',serialize($this->references));
 			
-			// zapisz instrukcje
+			// zapisz instrukcje tworznia szablonu
 			file_put_contents($this->core->templates.'/'.$this->core->name.'.i',serialize($this->instructions));
 			
 			echo '<p>Utworzono plik cache</p>';

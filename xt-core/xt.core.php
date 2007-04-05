@@ -28,6 +28,7 @@ define('HTML', 3);
 define('XML', 4);
 define('RSS', 5);
 define('ATOM', 6);
+
 define('STRING', 1);
 class xt{
 	private $core=array('fragment', 'getnode', 'switcher', 'dom', 'cache');
@@ -36,7 +37,7 @@ class xt{
 	
 	public $dir;
 	
-	public function __construct($file=0){
+	public function __construct($file=0){ $this->debug=0;
 		$this->start_time=$this->microtime_float();
 		
 		
@@ -61,7 +62,7 @@ class xt{
 			$this->name=basename($file);
 			$this->fullname=$this->dir.'/'.$file;
 			
-			echo '<p>Pełna nazwa pliku to<code>:'.$this->fullname.'</code></p>';
+			if($this->debug)echo '<p>Pełna nazwa pliku to<code>:'.$this->fullname.'</code></p>';
 			
 			$this->template=file_get_contents($this->fullname);
 			
@@ -132,12 +133,12 @@ class xt{
 	
 	public function add($name, $value){
 		if(is_string($value) || is_int($value)){
-			if(isset($this->cache->references[$name])){
+			if(isset($this->cache->instructions[$name][STRING])){
 				$index=$this->cache->references[$name];
-				if(!isset($this->cache->values[$index])){
-					$this->cache->values[$index]=$value;
+				if(!isset($this->cache->values[$index]['string'])){
+					$this->cache->values[$index]['string']=$value;
 				}else{
-					$this->cache->values[$index].=$value;
+					$this->cache->values[$index]['string'].=$value;
 				}
 			}else{
 				echo '<p>Używam add z cache, bo nie znalazłem obiektu <code>'.$name.'</code> w <code>$cache->objects</code></p>';
@@ -177,6 +178,22 @@ class xt{
 		}else{
 			return false;
 		}*/
+	}
+	
+	public function set($css, $attributes){
+		if(is_string($attributes) || is_int($attributes)){
+			if(isset($this->cache->references[$name])){
+				$index=$this->cache->references[$name];
+				if(!isset($this->cache->values[$index])){
+					$this->cache->values[$index]=$value;
+				}else{
+					$this->cache->values[$index].=$value;
+				}
+			}else{
+				echo '<p>Używam add z cache, bo nie znalazłem obiektu <code>'.$name.'</code> w <code>$cache->objects</code></p>';
+				$this->cache->add($name, STRING);
+			}
+		}
 	}
 	
 	public function display(){
