@@ -22,12 +22,12 @@
 
 class cache{
 	private
-		$references,
+		
 		$instructions;
 		
 	public
-		$create=false,
-		$objects;
+		$references,
+		$create=false;
 	
 	/*
 		references  (tablica) zapisywane są
@@ -73,9 +73,10 @@ class cache{
 		if(file_exists($this->core->templates.'/'.$this->core->name.'.xc') && file_exists($this->core->templates.'/'.$this->core->name.'.php')){
 			echo '<p>Pliki cache są</p>';
 			$this->code=file_get_contents($this->core->templates.'/'.$this->core->name.'.xc');
-			$this->objects=unserialize(file_get_contents($this->core->templates.'/'.$this->core->name.'.php'));
+			$this->references=unserialize(file_get_contents($this->core->templates.'/'.$this->core->name.'.php'));
+			$this->instructions=unserialize(file_get_contents($this->core->templates.'/'.$this->core->name.'.i'));
 			
-			$this->count=count($this->objects);
+			$this->count=count($this->references);
 		}else{
 			echo '<p>Plik cache nie istnieje.</p>';
 		}
@@ -101,6 +102,7 @@ class cache{
 	}
 	
 	public function create(){ echo "<div style='border:2px solid'>";
+		$this->references=array(); // wykasuj referencje, bo tworzymy je od nowa
 		foreach($this->instructions as $css => $value){
 			$node=$this->core->dom->getOneNode($css);
 			if(!isset($node->name)){
@@ -134,13 +136,16 @@ class cache{
 			$header.="\n".'*/ ?>';
 		
 			// zapisz szablon
-			//var_dump($this->core->dom);
-			if(file_put_contents($this->core->templates.'/'.$this->core->name.'.xc', $header.$this->core->dom->display()) &&
+			file_put_contents($this->core->templates.'/'.$this->core->name.'.xc', $header.$this->core->dom->display());
 			
-			// zapisz obiekty
-			file_put_contents($this->core->templates.'/'.$this->core->name.'.php',serialize($this->objects))){
-				echo '<p>Utworzono plik cache</p>';
-			}
+			// zapisz referencje obiektów
+			file_put_contents($this->core->templates.'/'.$this->core->name.'.php',serialize($this->references));
+			
+			// zapisz instrukcje
+			file_put_contents($this->core->templates.'/'.$this->core->name.'.i',serialize($this->instructions));
+			
+			echo '<p>Utworzono plik cache</p>';
+			
 			
 			echo '<p>Szablon wynikowy<pre>'.htmlspecialchars($this->core->dom->display()).'</pre></p>';
 			

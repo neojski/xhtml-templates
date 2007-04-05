@@ -132,15 +132,15 @@ class xt{
 	
 	public function add($name, $value){
 		if(is_string($value) || is_int($value)){
-			if(isset($this->cache->objects[$name])){
-				$index=$this->cache->objects[$name];
+			if(isset($this->cache->references[$name])){
+				$index=$this->cache->references[$name];
 				if(!isset($this->cache->values[$index])){
 					$this->cache->values[$index]=$value;
 				}else{
 					$this->cache->values[$index].=$value;
 				}
 			}else{
-				echo '<p>Używam add z cache, bo nie znalazłem obiektu w <code>$cache->objects</code></p>';
+				echo '<p>Używam add z cache, bo nie znalazłem obiektu <code>'.$name.'</code> w <code>$cache->objects</code></p>';
 				$this->cache->add($name, STRING);
 			}
 		}/*elseif($this->dom->is_node($value)){

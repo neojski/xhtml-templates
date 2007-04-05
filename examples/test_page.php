@@ -18,12 +18,13 @@ try{
 	
 	
 	
-	$xt->add('#a', date('U'));
+	$xt->add('#a', 'test');
 	$xt->add('html #a', date('U'));
 	$xt->add('html body #a', date('U'));
 	$xt->add('#b', date('U'));
 	$xt->add('#c', date('U'));
 	$xt->add('#d', date('U'));
+	$xt->add('body sdfa fsda dsaf ds ds', date('U'));
 	
 	/*$xt->add('#b', mt_rand(0,100));
 	
@@ -46,9 +47,9 @@ try{
 	$xt->add('title', 'test');
 	
 	
-	$xt->add('html * *', mt_rand(0,100));
+	$xt->add('html * *', mt_rand(0,100));*/
 	
-	$xt->display(1);*/
+	$xt->display(1);
 }catch(xtException $e){
 	echo $e;
 }
