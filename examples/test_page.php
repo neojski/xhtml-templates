@@ -26,7 +26,7 @@ try{
 	$xt->add('#d', date('U'));
 	$xt->add('body sdfa fsda dsaf ds ds', date('U'));
 	
-	/*$xt->add('#b', mt_rand(0,100));
+	/**/$xt->add('#b', mt_rand(0,100));
 	
 	$xt->add('#c', 'test');
 	
@@ -47,7 +47,7 @@ try{
 	$xt->add('title', 'test');
 	
 	
-	$xt->add('html * *', mt_rand(0,100));*/
+	$xt->add('html * *', mt_rand(0,100));
 	
 	$xt->display(1);
 }catch(xtException $e){
