@@ -30,35 +30,10 @@ class cache{
 		$create=false;
 	
 	/*
-		references  (tablica) zapisywane są
-			[nazwa_obiektu] => nazwa_w_xt_cache
-			
-			np.
-			
-			[Object id #10] => obiekt3
-			[Object id #13] => obiekt3
-			
-		objects (tablica) zawiera:
-			[odwołanie_css_do_obiektu] => nazwa_w_xt_cache
-			
-			np.
-			
-			[html > body] => obiekt3
-			[html body] => obiekt3
-			
-		make_cache (tablica)
-			[odwołanie_css_do_obiektu] => array( co_z_nim_zrobić )
-			
-			np.
-			
-			[html > body] => array ( 'pętla' );
-			
-	*/
-	
-	/*
 		plik:
 			nazwa.xc - plik cache
 			nazwa.php - plik zawierający obiekty
+			nazwa.i - instrukcje tworzenia cache
 	*/
 	
 	public function __construct(&$xt){
@@ -70,7 +45,7 @@ class cache{
 		wczytaj je
 	*/
 	public function load(){
-		if(file_exists($this->core->templates.'/'.$this->core->name.'.xc') && file_exists($this->core->templates.'/'.$this->core->name.'.php')){
+		if(file_exists($this->core->templates.'/'.$this->core->name.'.xc') && file_exists($this->core->templates.'/'.$this->core->name.'.php') && file_exists($this->core->templates.'/'.$this->core->name.'.i')){
 			echo '<p>Pliki cache są</p>';
 			$this->code=file_get_contents($this->core->templates.'/'.$this->core->name.'.xc');
 			$this->references=unserialize(file_get_contents($this->core->templates.'/'.$this->core->name.'.php'));
