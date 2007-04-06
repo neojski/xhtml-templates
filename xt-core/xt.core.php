@@ -91,10 +91,12 @@ class xt{
 	 */
 	public function __get($name){
 		if($name=='dom'){
-			require_once('xt.dom.php');
-			$this->dom=new dom($this);
-			$this->dom->load($this->fullname);
-			return $this->dom;
+			if(!isset($this->dom)){
+				require_once('xt.dom.php');
+				$this->dom=new dom($this);
+				$this->dom->load($this->fullname);
+				return $this->dom;
+			}
 		}
 		
 		if(in_array($name, $this->plugins)){

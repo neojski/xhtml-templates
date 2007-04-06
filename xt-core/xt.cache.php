@@ -104,15 +104,16 @@ class cache{
 									echo "<'.$name.'";
 									'.$old_attr.'
 									foreach($this->cache->values["'.$node->name.'"]["attributes"] as $k => $v){
-										echo " ".$k."=".$v;
+										echo " ".$k."=\"".$v."\"";
 									}
 									echo ">"
 								?>');
 							
 							$this->core->dom->appendText($node, '<?php echo "</'.$name.'>" ?>');
 							$node->xt[ATTRIBUTES]=true;
-							echo $node.'<BR>';
+							
 							$node->xt['delete']=true;
+							$this->core->dom->removeParent($node); /* powinno się usuwać potem!!!!!!!!!!!!1*/
 						}
 						break;
 				}
@@ -120,7 +121,7 @@ class cache{
 		}
 		
 		/* usuń ozacznone */
-		foreach($this->core->dom->getElementsByTagName('*') as $node){ echo $node->nodeName;
+		foreach($this->core->dom->xml->getElementsByTagName('*') as $node){ echo 'xxxxxx'; echo $this->core->dom->display();
 			if(isset($node->xt)){
 				echo 'ta';
 			}
