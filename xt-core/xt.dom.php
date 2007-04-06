@@ -142,6 +142,14 @@ class dom{
 		}
 	}
 	
+	public function get_attributes($node){
+		$return=array();
+		foreach($node->attributes as $attribute){
+			$return[$attribute->name]=$attribute->value;
+		}
+		return $return;
+	}
+	
 	/**
 	 * delete parent of the node
 	 * @param domnode node
@@ -199,6 +207,20 @@ class dom{
 			}
 		}
 	}
+	
+	public function appendStartText($node, $str){
+		if($this->is_node($node)){
+			if($node->hasChildNodes()){
+				if($child=$this->text2html($str)){
+					$this->insertBefore($node->firstChild, $child);
+				}
+			}else{
+				$this->appendText($node, $str);
+			}
+		}
+	}
+	
+	
 	
 	/**
 	 * zamiana tekstu na obiekt dom

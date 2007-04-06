@@ -62,18 +62,6 @@ class cache{
 		}elseif($value==ATTRIBUTES){
 			$this->instructions[$css][ATTRIBUTES]=true;
 		}
-		
-		/*$node=$this->core->dom->getOneNode($css);
-		
-		if(!isset($this->references[(string)$node])){
-			$name='obiekt'.++$this->count;
-			$this->references[(string)$node]=$name;
-			$this->core->dom->add($node, '<?php echo $this->cache->values[\''.$name.'\'];?>');
-		}else{
-			$name=$this->references[(string)$node];
-		}
-		
-		$this->objects[$css]=$name;*/
 	}
 	
 	public function create(){ echo "<div style='border:2px solid'>";
@@ -86,6 +74,7 @@ class cache{
 			if(!isset($this->references[$css])){
 				$this->references[$css]=$node->name;
 			}
+			
 			foreach($value as $k => $v){
 				switch($k){
 					case STRING:
@@ -95,21 +84,52 @@ class cache{
 						}
 						break;
 					case ATTRIBUTES:
-						/* zżera stare atrybuty */
 						if(!isset($node->xt[ATTRIBUTES])){
-							if($node->xt[NAME]){
+							if(isset($node->xt[NAME])){ // jeśli ustawiono nowy name - użyj nowego
 								$name='$this->cache->values[\''.$node->name.'\'][\'name\']';
 							}else{
 								$name=$node->nodeName;
 							}
-							$this->core->dom->appendText($node, '<?php echo \''.$name.'\'; foreach($this->cache->values[\''.$node->name.'\'][\'attributes\'] as $k => $v){ echo $k.\'="\'.$v.\'"\';} ?>');
+							
+							/* wczytaj listę starych atrybutów, sprawdzaj, czy nie zastąpiono ich nowymi */
+							$old_attr='';
+							foreach($this->core->dom->get_attributes($node) as $k=>$v){
+								$old_attr.='if(!isset($this->cache->values["'.$node->name.'"]["attributes"]["'.$k.'"])){
+									$this->cache->values["'.$node->name.'"]["attributes"]["'.$k.'"]="'.$v.'";
+								}';
+							}
+							
+							$this->core->dom->appendStartText($node, '
+								<?php 
+									echo "<'.$name.'";
+									'.$old_attr.'
+									foreach($this->cache->values["'.$node->name.'"]["attributes"] as $k => $v){
+										echo " ".$k."=".$v;
+									}
+									echo ">"
+								?>');
+							
+							$this->core->dom->appendText($node, '<?php echo "</'.$name.'>" ?>');
 							$node->xt[ATTRIBUTES]=true;
+							echo $node.'<BR>';
 							$node->xt['delete']=true;
 						}
 						break;
 				}
 			}
 		}
+		
+		/* usuń ozacznone */
+		foreach($this->core->dom->getElementsByTagName('*') as $node){ echo $node->nodeName;
+			if(isset($node->xt)){
+				echo 'ta';
+			}
+			if(isset($node->xt['delete'])){
+				echo 'aaaaaaaaaaaaaaaaaaaaaa';
+				$this->core->dom->removeParent($node);
+			}
+		}
+		
 		echo '</div>';
 	}
 	
@@ -117,7 +137,6 @@ class cache{
 		if($this->create){
 			echo '<p>Tworzenie pliku cache...</p>';
 			$this->create();
-		
 			
 			$header='<?php /*';
 			$header.="\n".'Cache szablonu systemu xt. Zbudowano '.date(DATE_RFC822);
@@ -146,8 +165,5 @@ class cache{
 			echo '</pre></p>';
 			
 		}
-		/*echo '<pre style="border:2px solid">Tablica $objects';
-		print_r($this->objects);
-		echo '</pre>';*/
 	}
 }
