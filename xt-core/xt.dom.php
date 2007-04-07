@@ -260,9 +260,6 @@ class dom{
 	 * @return null / object domnode
 	 */
 	public function getnode($name, $parent=0, $count=false){
-		if(!isset($this->template)){
-			$this->load();
-		}
 		if($this->is_node($name)){
 			return $name;
 		}else{
@@ -284,9 +281,6 @@ class dom{
 		}
 	}
 	public function add($name, $value){
-		if(!isset($this->template)){
-			$this->load();
-		}
 		if($node=$this->getOneNode($name)){
 			if(is_array($value) && isset($value[0]) && is_array($value[0])){
 				//$node->removeAttribute('id');

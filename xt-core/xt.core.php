@@ -162,16 +162,6 @@ class xt{
 				$this->r($node, $value);
 			}elseif(is_array($value)){
 				$this->set($node, $value);
-			}elseif(is_string($value)){
-				if(!in_array($name, $this->caches)){
-					$this->createCache=true;
-					$this->appendText($node, '<![CDATA[<?php echo $xt->cache[\'obiekt'.$this->cache->count++.'\'];?>]]>');
-					
-					$this->cache[$name]=$value;
-				}else{
-					$this->cache[$name]=$value;
-				}
-				
 			}elseif($this->is_node($value)){
 				$node->appendChild($value);
 			}elseif($value instanceof fragment){
@@ -202,7 +192,7 @@ class xt{
 	
 	public function display(){
 		if(!$this->cache->create){
-			eval('?>'.$this->cache->code.'<?php');
+			eval('?>'.$this->cache->code);
 			echo '<p>Czas wykonywania skryptu to '.($this->microtime_float()-$this->start_time).'s</p>';
 		}else{
 			echo '<p>Tworzę cache, odśwież, aby zobaczyć efekt</p>';

@@ -94,26 +94,27 @@ class cache{
 							/* wczytaj listę starych atrybutów, sprawdzaj, czy nie zastąpiono ich nowymi */
 							$old_attr='';
 							foreach($this->core->dom->get_attributes($node) as $k=>$v){
-								$old_attr.='if(!isset($this->cache->values["'.$node->name.'"]["attributes"]["'.$k.'"])){
-									$this->cache->values["'.$node->name.'"]["attributes"]["'.$k.'"]="'.$v.'";
-								}';
+								$old_attr.='if(!isset($this->cache->values["'.$node->name.'"]["attributes"]["'.$k.'"])){'.
+									'$this->cache->values["'.$node->name.'"]["attributes"]["'.$k.'"]="'.$v.'";'.
+								'}';
 							}
 							
-							$this->core->dom->appendStartText($node, '
-								<?php 
-									echo "<'.$name.'";
-									'.$old_attr.'
-									foreach($this->cache->values["'.$node->name.'"]["attributes"] as $k => $v){
-										echo " ".$k."=\"".$v."\"";
-									}
-									echo ">"
-								?>');
+							$this->core->dom->appendStartText($node, 
+								'<?php '.
+									'echo "<'.$name.'";'.
+									''.$old_attr.''.
+									'if(is_array($this->cache->values["'.$node->name.'"]["attributes"]))foreach($this->cache->values["'.$node->name.'"]["attributes"] as $k => $v){'.
+										'echo " ".$k."=\"".$v."\"";'.
+									'}'.
+									'echo ">"'.
+								'?>');
 							
 							$this->core->dom->appendText($node, '<?php echo "</'.$name.'>" ?>');
 							$node->xt[ATTRIBUTES]=true;
 							
 							$node->xt['delete']=true;
-							$this->core->dom->removeParent($node); /* powinno się usuwać potem!!!!!!!!!!!!1*/
+							
+							$node->setAttribute('usun', 'tak'); /*tymczasem usuwaj korzystając z atrybutu*/
 						}
 						break;
 				}
@@ -121,12 +122,8 @@ class cache{
 		}
 		
 		/* usuń ozacznone */
-		foreach($this->core->dom->xml->getElementsByTagName('*') as $node){ echo 'xxxxxx'; echo $this->core->dom->display();
-			if(isset($node->xt)){
-				echo 'ta';
-			}
-			if(isset($node->xt['delete'])){
-				echo 'aaaaaaaaaaaaaaaaaaaaaa';
+		foreach($this->core->dom->getElementsByTagName('*') as $node){
+			if($node->getAttribute('usun')){
 				$this->core->dom->removeParent($node);
 			}
 		}

@@ -24,8 +24,10 @@ try{
 	
 	$xt->set('#a', array('style'=>'color:#'.dechex(mt_rand(0,255)).dechex(mt_rand(0,255)).dechex(mt_rand(0,255))));
 	
+	//$xt->set('title', array('style'=>'color:#'.dechex(mt_rand(0,255)).dechex(mt_rand(0,255)).dechex(mt_rand(0,255))));
 	
-	$xt->add('html * *', mt_rand(0,100));
+	
+	$xt->add('html * *', mt_rand(0,1000000000000));
 	
 	$xt->display(1);
 }catch(xtException $e){
