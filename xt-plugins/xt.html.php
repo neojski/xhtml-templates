@@ -45,6 +45,11 @@ class html /*extends xml*/{
 	}
 }
 
+/*
+	TODO:
+	* koniecznie dodać obsługę i automatyczny wybór między _GET i _POST
+	* usprawnić szybkościowo
+*/
 class form{
 	public function __construct($html){
 		$this->core=$html->core;
