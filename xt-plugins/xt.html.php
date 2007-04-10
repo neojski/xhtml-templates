@@ -51,13 +51,23 @@ class form{
 	}
 	
 	public function memory($css){
-		foreach($_POST as $name => $value){
-			$this->core->set('input[name="'.$name.'"]:not([type="submit"])', array('value'=>$value));
+		foreach($this->core->getnode($css.' input[name][type="text"]') as $input){
+			$name=$input->getAttribute('name');
+			if(isset($_POST[$name])){
+				$input->setAttribute('value',$_POST[$name]);
+			}
 		}
+		
+		foreach($this->core->getnode($css.' textarea[name]') as $textarea){
+			$name=$textarea->getAttribute('name');
+			if(isset($_POST[$name])){
+				$this->core->add($textarea, $_POST[$name]);
+			}
+		}
+		/* powinno być rozwiązane inaczej - tak jest niewydajnie */
 		foreach($_POST as $name => $value){
-			if(!empty($value)){
-				$value=str_replace(' ', '%20', $value);
-				$this->core->set('select[name="'.$name.'"] option[value="'.$value.'"]', array('selected'=>'selected'));
+			foreach($this->core->getnode($css.' select[name="'.$name.'"] option[value="'.$value.'"]') as $select){
+				$select->setAttribute('selected','selected');
 			}
 		}
 	}

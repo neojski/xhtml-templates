@@ -214,15 +214,16 @@ class getNode{
 		
 		if($match[1]=='#text'){ // magiczny atrybut oznaczający zawartość tekstową
 			$attribute='.';
-			$separator=$match[2];
-			$value=$match[3];
+			$separator=isset($match[2])?$match[2]:'';
+			$value=isset($match[3])?$match[3]:'';
 		}else{
-			$attribute='@'.$match[1];
-			$separator=$match[2];
-			$value=$match[3];
+			$attribute='@'.(isset($match[1])?$match[1]:'');
+			$separator=isset($match[2])?$match[2]:'';
+			$value=isset($match[3])?$match[3]:'';
 		}
 		
-		if(isset($value)){
+		
+		if(!empty($value)){
 			switch($separator){
 				case '':
 					$match=$attribute.'="'.$value.'"';
