@@ -28,12 +28,36 @@ class html /*extends xml*/{
 		$this->core=$xt;
 	}
 	
+	public function __get($name){
+		if($name=='form'){
+			return new form($this);
+		}
+	}
+	
 	public function title($str, $replace=false){
 		if($title=$this->core->getElementByTagName('title')){
 			if(!$replace){
 				$title->nodeValue.=$str;
 			}else{
 				$title->nodeValue=$str;
+			}
+		}
+	}
+}
+
+class form{
+	public function __construct($html){
+		$this->core=$html->core;
+	}
+	
+	public function memory($css){
+		foreach($_POST as $name => $value){
+			$this->core->set('input[name="'.$name.'"]:not([type="submit"])', array('value'=>$value));
+		}
+		foreach($_POST as $name => $value){
+			if(!empty($value)){
+				$value=str_replace(' ', '%20', $value);
+				$this->core->set('select[name="'.$name.'"] option[value="'.$value.'"]', array('selected'=>'selected'));
 			}
 		}
 	}

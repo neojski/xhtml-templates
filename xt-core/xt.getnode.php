@@ -38,6 +38,7 @@ class getNode{
 		if($this->method===2){
 			$this->xpath='.';
 		
+			/* uwaga, jeśli atrybut ma ` ` to jest błąd */
 			$match=preg_split('#(\s*(?:>|(?<!n)\+|~(?!=))\s*|\s+)#', trim($str), -1, PREG_SPLIT_DELIM_CAPTURE);
 			array_unshift($match, null);
 			
