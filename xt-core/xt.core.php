@@ -280,7 +280,10 @@ class xt{
 	public function appendText($node, $str){
 		if($this->is_node($node)){
 			if($child=$this->text2html($str)){
-				$node->appendChild($child);
+				if($child->hasChildNodes()){
+				// prevent ,,Warning: DOMNode::appendChild(): Document Fragment is empty''
+					$node->appendChild($child);
+				}
 			}
 		}
 	}
