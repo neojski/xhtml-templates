@@ -37,8 +37,14 @@ class getNode{
 		$this->parent=$parent?$parent:$this->root;
 		if($this->method===2){
 			$this->xpath='.';
-		
-			/* uwaga, jeśli atrybut ma ` ` to jest błąd */
+			
+			/*
+				workaround dla spacji w wartości atrybutu
+			*/
+			$str=preg_replace('#\[[^\]]+\]#e', 'str_replace(" ", "%20", "$0")', $str);
+			
+			
+			
 			$match=preg_split('#(\s*(?:>|(?<!n)\+|~(?!=))\s*|\s+)#', trim($str), -1, PREG_SPLIT_DELIM_CAPTURE);
 			array_unshift($match, null);
 			
@@ -50,7 +56,7 @@ class getNode{
 			
 			$count=count($match);
 			for($i=0; $i<$count; $i+=2){
-				$str=$match[$i+1];
+				$str=str_replace("%20", " ", $match[$i+1]); /* dalsza część workaroundu */
 				$glue=$match[$i];
 				
 				$this->add($str, $glue);
@@ -387,6 +393,8 @@ class getNode{
 			if($this->debug){
 				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';
 			}
+			
+			//print_r($results);
 			
 			return $results;
 		}
