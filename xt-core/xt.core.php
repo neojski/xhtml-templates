@@ -32,7 +32,6 @@ class xt{
 	private $core=array('fragment', 'getnode', 'switcher');
 	public function __construct($file=0, $is_string=0){
 		$this->dir=dirname(__FILE__);
-		
 		$this->start_time=microtime(true);
 		$this->find_plugins();
 		$this->debug=false;
@@ -43,6 +42,10 @@ class xt{
 		}
 	}
 	
+	/**
+	 * an easy method for finding plugins 
+	 * in xt-plugins directory
+	 */
 	private function find_plugins(){
 		$this->plugins=array();
 		foreach(glob($this->dir.'/../xt-plugins/*') as $file){
@@ -51,7 +54,7 @@ class xt{
 	}
 	
 	/**
-	 * include plugins
+	 * include plugins, only when necessary
 	 */
 	public function __get($name){
 		if(in_array($name, $this->plugins)){
@@ -60,7 +63,6 @@ class xt{
 				$this->$name=new $name($this);
 			}
 		}
-		
 		if(in_array($name, $this->core)){
 			if($name=='fragment'){
 				if(!class_exists('fragment')){
@@ -87,7 +89,7 @@ class xt{
 	/**
 	 * @param str filename/template
 	 */
-	public function load($file, $is_string=0){
+	public function load($file, $is_string=false){
 		if(!$is_string){
 			if(file_exists($file)){
 				$this->template=file_get_contents($file);
@@ -98,8 +100,6 @@ class xt{
 			$this->template=$file;
 		}
 		
-		//$this->template=str_replace(array('<![CDATA[', ']]>'), '', $this->template);
-		
 		$this->xml=new mydom();
 		
 		//$this->xml->resolveExternals=true;
@@ -107,7 +107,7 @@ class xt{
 		$this->check_encoding();
 		
 		/* usuń xmlns, które tymczasem psuje wszystko */
-		$this->template=preg_replace('#xmlns="[^"]+"#', '', $this->template);
+		//$this->template=preg_replace('#xmlns="[^"]+"#', '', $this->template);
 		
 		$this->xml->loadxml($this->template);
 		
@@ -120,6 +120,10 @@ class xt{
 		$this->useXML=$this->xml();
 	}
 	
+	/**
+	 * check encoding:
+	 * add xml encoding prologue, which is necessary for loadxml
+	 */
 	private function check_encoding(){
 		if(preg_match('#<\?xml[^>]+encoding="([^"]+)"[^>]*?>#', $this->template, $encoding)){
 			$this->encoding=$encoding[1];
@@ -158,14 +162,14 @@ class xt{
 	public function display($mime=0){
 		/************* xpath tests *****************
 		$xpath = new DOMXPath($this->xml);
-		$query = '//div[substring(., 2)="d a"]';
+		$query = '//node()[local-name()="div"]';
 		$objects = $xpath->query($query);
 		
-		echo 'Obiekty<ul>';
+		echo '<div style="border:2px solid">Obiekty:<ul>';
 		foreach($objects as $object){
 			echo '<li><code>'.$object->nodeName.'</code>:<code>'.$object->nodeValue.'</code></li>';
 		}
-		echo '</ul>';
+		echo '</ul></div>';
 		
 		/************* xpath tests *****************/
 		foreach($this->getElementsByClassName('remove_id') as $node){
@@ -283,6 +287,25 @@ class xt{
 	}
 	
 	/**
+	 * dodanie zawartości tekstowej obiektowi, ale na początku
+	 * @param object domelement
+	 * @param str append-text
+	 */
+	public function appendStartText($node, $str){
+		if($this->is_node($node)){
+			if($node->hasChildNodes()){
+				if($child=$this->text2html($str)){
+					if($child->hasChildNodes()){// prevent ,,Warning: DOMNode::appendChild(): Document Fragment is empty''
+						$this->insertBefore($node->firstChild, $child);
+					}
+				}
+			}else{
+				$this->appendText($node, $str);
+			}
+		}
+	}
+	
+	/**
 	 * zamiana tekstu na obiekt dom
 	 * @param str text
 	 * @return object domelement
@@ -383,6 +406,9 @@ class xt{
 			return false;
 		}
 	}
+	
+	
+	
 	
 	/**
 	 * smarty compatible
@@ -566,7 +592,7 @@ class xt{
 	}
 	
 	/**
-	 * zwraca listę obiektów w formie domnodelist
+	 * zwraca listę obiektów w formie domnodelist, using xpath - faster!
 	 * @param mixed klasa
 	 * @param domnode parent
 	 * @param string tag_nane

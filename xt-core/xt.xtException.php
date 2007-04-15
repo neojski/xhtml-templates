@@ -20,6 +20,9 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 class xtException extends Exception{
+	/**
+	 * this could return various codes
+	 */
 	public function __construct($message, $code = 0){
 		if($code==1){
 			//die('(z exception - umieram)'.$message);
@@ -27,6 +30,9 @@ class xtException extends Exception{
 		parent::__construct($message, $code);
 	}
 	
+	/**
+	 * display errors
+	 */
 	public function __toString(){
 		return '<p>Klasa <code>'.__CLASS__ . '</code> wyświetliła błąd wagi '.$this->code.': '.$this->message.'</p>';
 	}

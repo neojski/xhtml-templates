@@ -41,6 +41,9 @@ class html /*extends xml*/{
 			}else{
 				$title->nodeValue=$str;
 			}
+			return true;
+		}else{
+			return false;
 		}
 	}
 }
