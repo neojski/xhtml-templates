@@ -31,7 +31,9 @@ define('ATOM', 6);
 class xt{
 	private $core=array('fragment', 'getnode', 'switcher');
 	public function __construct($file=0, $is_string=0){
-		$this->start_time=$this->microtime_float();
+		$this->dir=dirname(__FILE__);
+		
+		$this->start_time=microtime(true);
 		$this->find_plugins();
 		$this->debug=false;
 		$this->getnode_method=2;
@@ -43,7 +45,7 @@ class xt{
 	
 	private function find_plugins(){
 		$this->plugins=array();
-		foreach(glob('../trunk/xt-plugins/*') as $file){
+		foreach(glob($this->dir.'/../xt-plugins/*') as $file){
 			$this->plugins[]=substr(basename($file, '.php'), 3);
 		}
 	}
@@ -54,7 +56,7 @@ class xt{
 	public function __get($name){
 		if(in_array($name, $this->plugins)){
 			if(!isset($this->$name)){
-				require_once('../trunk/xt-plugins/xt.'.$name.'.php');
+				require_once($this->dir.'/../xt-plugins/xt.'.$name.'.php');
 				$this->$name=new $name($this);
 			}
 		}
@@ -62,11 +64,11 @@ class xt{
 		if(in_array($name, $this->core)){
 			if($name=='fragment'){
 				if(!class_exists('fragment')){
-					require_once('xt.fragment.php');
+					require_once($this->dir.'/xt.fragment.php');
 				}
 				return new fragment($this);
 			}elseif(!isset($this->$name)){
-				require_once('xt.'.$name.'.php');
+				require_once($this->dir.'/xt.'.$name.'.php');
 				$this->$name=new $name($this);
 			}
 		}
@@ -80,14 +82,6 @@ class xt{
 		if(!method_exists($this, $name)){
 			 throw new xtException('Metoda '.$name.' nie istnieje!', E_WARNING);
 		}
-	}
-	
-	/**
-	 * check parsing time
-	 */
-	public function microtime_float(){
-		list($usec, $sec) = explode(" ", microtime());
-		return ((float)$usec + (float)$sec);
 	}
 	
 	/**
@@ -186,7 +180,7 @@ class xt{
 			$node->removeAttribute('class');
 		}
 		
-		$this->add($this->body, '<p id="stopka">Ta strona została wygenerowana właśnie dzięki xt. Czas wykonywania skryptu to '.($this->microtime_float()-$this->start_time).'s</p>');
+		$this->add($this->body, '<p id="stopka">Ta strona została wygenerowana właśnie dzięki xt. Czas wykonywania skryptu to '.(microtime(true)-$this->start_time).'s</p>');
 		
 		$mime_tab=array(
 			2 => 'application/xhtml+xml',
