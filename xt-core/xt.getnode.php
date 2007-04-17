@@ -96,8 +96,50 @@ class getNode{
 			koniec listy wyrażeń
 		*/
 		
-		if(preg_match('#^'.$r_name.'|\*#', $str, $match)){
+		if(preg_match('#^(?:([a-z]*)(\|))?('.$r_name.')|\*#', $str, $match)){
 			// tak, mamy nazwę
+			
+			/*
+				[1]=>namespace
+				[2]=>|
+				[3]=>nodeName
+			*/
+			
+			/*
+				n summary:
+
+				ns|E
+				elements with name E in namespace ns
+				*|E
+				elements with name E in any namespace, including those without any declared namespace
+				|E
+				elements with name E without any declared namespace
+				E
+				if no default namespace has been specified, this is equivalent to *|E. Otherwise it is equivalent to ns|E where ns is the default namespace.
+    			*/
+			
+			if(!empty($match[2])){
+				
+				if(!empty($match[1])){
+					//mamy namespace
+					if($match[1]!=='*'){
+						//ustalony namespace
+						$this->type[]='name()="'.$match[1].':'.$match[3].'"';
+					}else{
+						//dowolny namespace
+						$this->type[]='local-name()="'.$match[3].'"';
+					}
+				}else{
+					//elementy z domyślnym namespace
+					$this->type[]='name()="'.$match[3].'"';
+				}
+			}else{
+				//brak namespace
+				
+				$this->type[]='name()="'.$match[3].'"';
+			}
+			
+			//print_r($match);
 			$name=$match[0];
 			
 			$str=substr($str, strlen($name));
@@ -112,10 +154,6 @@ class getNode{
 		}
 		preg_match_all('#('.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_negation.'|'.$r_pseudo.')#', $str, $match);
 		
-		if($this->debug){
-			print_r($match);
-		}
-		
 		if(empty($match[0])){
 			// nothing ?
 		}else{
@@ -126,8 +164,6 @@ class getNode{
 		
 		$glue=$this->getglue($glue);
 		$this->xpath.=$glue.'*';
-		
-		$this->type[]='name()="'.$name.'"';
 		
 		if(!empty($this->child)){
 			$this->xpath.='/../*['.implode(' and ', $this->child).']/self::'.$name;
