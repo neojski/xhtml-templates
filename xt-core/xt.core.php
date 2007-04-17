@@ -206,7 +206,7 @@ class xt{
 				if(!headers_sent()){
 					header('Content-Type: text/html; charset='.$this->encoding);
 				}
-				echo preg_replace(array('#<!DOCTYPE[^>]+>#', '#xml:lang="[^"]+"#', '#xmlns="[^"]+"#'), array('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">', '', ''), $this->xml->saveHTML());
+				echo preg_replace('#<\?xml[^?]+\?>#s', '', $this->xml->saveXML());
 			}
 		}else{
 			if(!headers_sent()){
