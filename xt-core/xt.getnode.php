@@ -125,7 +125,9 @@ class getNode{
 		}
 		
 		$glue=$this->getglue($glue);
-		$this->xpath.=$glue.$name;
+		$this->xpath.=$glue.'*';
+		
+		$this->type[]='name()="'.$name.'"';
 		
 		if(!empty($this->child)){
 			$this->xpath.='/../*['.implode(' and ', $this->child).']/self::'.$name;
