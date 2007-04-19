@@ -206,7 +206,7 @@ class xt{
 				if(!headers_sent()){
 					header('Content-Type: text/html; charset='.$this->encoding);
 				}
-				echo preg_replace('#<\?xml[^?]+\?>#s', '', $this->xml->saveXML());
+				echo preg_replace('#<\?xml[^?]+\?>#s', '', $this->xml->saveXML(), 1);
 			}
 		}else{
 			if(!headers_sent()){
