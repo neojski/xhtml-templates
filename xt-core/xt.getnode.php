@@ -438,7 +438,7 @@ class getNode{
 			
 			$results = $this->xpo->query($this->xpath, $this->parent);
 			
-			if($this->debug||1){
+			if($this->debug){
 				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';
 			}
 			
