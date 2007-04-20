@@ -80,9 +80,6 @@ class getNode{
 	}
 	
 	private function add($str, $glue=0){
-		/*
-			zestaw skróconych wyrażeń
-		*/
 		$r_name='[_a-z0-9]+';
 		$r_id='[_a-z0-9-]+';
 		$r_hash='\#'.$r_id;
@@ -96,7 +93,7 @@ class getNode{
 			koniec listy wyrażeń
 		*/
 		
-		if(preg_match('#^(?:([a-z]*)(\|))?('.$r_name.')|\*#', $str, $match)){
+		if(preg_match('#^(?:([a-z]*|\*)(\|))?('.$r_name.'|\*)|\*$#', $str, $match)){
 			// tak, mamy nazwę
 			
 			/*
@@ -116,6 +113,9 @@ class getNode{
 				elements with name E without any declared namespace
 				E
 				if no default namespace has been specified, this is equivalent to *|E. Otherwise it is equivalent to ns|E where ns is the default namespace.
+				
+				NOTE:
+				E will be always evuivalent to *|E, because we don't set the default namespace
     			*/
 			
 			if(!empty($match[2])){
@@ -124,10 +124,22 @@ class getNode{
 					//mamy namespace
 					if($match[1]!=='*'){
 						//ustalony namespace
-						$this->type[]='name()="'.$match[1].':'.$match[3].'"';
+						
+						if($match[3]!=='*'){
+							// mamy nazwę
+							$this->type[]='name()="'.$match[1].':'.$match[3].'"';
+						}else{
+							// dowolny obiekt o danym namespace
+							$this->type[]='substring(name(), 1, '.(strlen($match[1])+1).')="'.$match[1].':"';
+						}
 					}else{
 						//dowolny namespace
-						$this->type[]='local-name()="'.$match[3].'"';
+						if($match[3]!=='*'){
+							// mamy nazwę
+							$this->type[]='local-name()="'.$match[3].'"';
+						}else{
+							// dowolny obiekt o dowolnym namespace
+						}
 					}
 				}else{
 					//elementy z domyślnym namespace
@@ -135,18 +147,16 @@ class getNode{
 				}
 			}else{
 				//brak namespace
-				
-				$this->type[]='name()="'.$match[3].'"';
+				if($match[3]!=='*'){
+					// mamy nazwę
+					$this->type[]='local-name()="'.$match[3].'"';
+				}else{
+					// dowolny obiekt o dowolnym namespace
+				}
 			}
-			
-			//print_r($match);
 			$name=$match[0];
 			
-			$str=substr($str, strlen($name));
-			
-		}else{
-			// nie, nie podano nazwy
-			$name='*';
+			$str=substr($str, strlen($match[0]));
 		}
 		
 		if(!preg_match('#^(?:'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.'|'.$r_negation.')*$#', $str)){
@@ -428,7 +438,7 @@ class getNode{
 			
 			$results = $this->xpo->query($this->xpath, $this->parent);
 			
-			if($this->debug){
+			if($this->debug||1){
 				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';
 			}
 			
