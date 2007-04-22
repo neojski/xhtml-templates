@@ -102,9 +102,8 @@ class xt{
 		
 		$this->xml=new mydom();
 		
-		//$this->xml->resolveExternals=true;
-		
 		$this->check_encoding();
+		$this->check_namespaces();
 		
 		$this->xml->loadxml($this->template);
 		
@@ -130,6 +129,16 @@ class xt{
 		}else{
 			throw new xtException('Brak ustawionego kodowania', E_ERROR);
 		}
+	}
+	
+	/**
+	 * find namespaces definitions
+	 */
+	private function check_namespaces(){
+		preg_match_all('#xmlns:[a-z]+="[^"]+"#', $this->template, $match);
+		$namespaces=$match[0];
+		array_shift($namespaces);
+		$this->namespaces=implode(' ', $namespaces);
 	}
 	
 	/**
@@ -312,7 +321,13 @@ class xt{
 			return $str;
 		}elseif(is_string($str)){
 			$fragment=$this->xml->createDocumentFragment();
-			$fragment->appendXML($str);
+			$fragment->appendXML('<root '.$this->namespaces.'>'.$str.'</root>');
+			
+			foreach($fragment->firstChild->childNodes as $child){
+				$fragment->appendChild($child);
+			}
+			$fragment->removeChild($fragment->firstChild);
+			
 			return $fragment;
 		}elseif($str instanceof fragment){
 			return $str->s;
@@ -386,7 +401,6 @@ class xt{
 	public function add($name, $value){
 		if($node=$this->getOneNode($name)){
 			if(is_array($value) && isset($value[0]) && is_array($value[0])){
-				//$node->removeAttribute('id');
 				$this->r($node, $value);
 			}elseif(is_array($value)){
 				$this->set($node, $value);
@@ -548,11 +562,9 @@ class xt{
 			$fragment=$this->xml->createDocumentFragment();
 			$this->add($fragment, $new); # some problems with loop
 			
-			// jeśli jest ktoś za
 			if($this->is_node(nextSibling)){
 				$this->insertBefore($fragment, $old->nextSibling);
 			}else{
-			// jeśl nie ma nikogo za ;-)
 				$old->parentNode->appendChild($fragment);
 			}
 		}else{

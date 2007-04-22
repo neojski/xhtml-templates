@@ -431,6 +431,8 @@ class getNode{
 			if(!isset($this->xpo)){
 				$this->xpo = new DOMXPath($this->xml);
 			}
+			
+			$this->xpo->registerNamespace ( 'xt', 'uuu' );
 
 			if(is_int($count)){
 				//$this->xpath.='[position()='.$count.']';
