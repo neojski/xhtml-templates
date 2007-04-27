@@ -404,8 +404,8 @@ class xt{
 				$this->r($node, $value);
 			}elseif(is_array($value)){
 				$this->set($node, $value);
-			}elseif(is_string($value)){
-				$this->appendText($node, $value);
+			}elseif(is_scalar($value)){
+				$this->appendText($node, (string)$value);
 			}elseif($this->is_node($value)){
 				$node->appendChild($value);
 			}elseif($value instanceof fragment){
