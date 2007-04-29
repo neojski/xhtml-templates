@@ -117,6 +117,7 @@ class getNode{
 				NOTE:
 				E will be always evuivalent to *|E, because we don't set the default namespace
     			*/
+    			/* wszystko powinno odbywać się normalnie, czyli namespace:nodeName, jednak wymaga to przypisywania wszystkim namespace odpowiedniego skrótu, za pomocą DOMXPath->registerNamespace(), a potem kombinacji z tym, jeśli wybieramy dowolny namespace*/
 			
 			if(!empty($match[2])){
 				

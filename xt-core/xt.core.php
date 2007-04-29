@@ -105,7 +105,11 @@ class xt{
 		$this->check_encoding();
 		$this->check_namespaces();
 		
+		$this->add_entities_references();
+	
 		$this->xml->loadxml($this->template);
+		
+		
 		
 		$this->body=$this->xml->getElementsByTagName('body')->item(0);
 		$this->head=$this->xml->getElementsByTagName('head')->item(0);
@@ -114,6 +118,16 @@ class xt{
 		$this->xml->formatOutput=true;
 		$this->xml->standalone=false;
 		$this->useXML=$this->xml();
+	}
+	
+	private function add_entities_references(){
+		$this->entities_def='';
+		preg_match_all('#&[a-z]+;#', $this->template, $entities);
+		foreach($entities[0] as $entity){
+			$this->entities_def.='<!ENTITY '.substr($entity, 1, -1).' "'.html_entity_decode($entity, ENT_QUOTES, 'utf-8').'">';
+		}
+		
+		$this->template=preg_replace('#(<!DOCTYPE[^>]+)>#', '$1 ['.$this->entities_def.']>', $this->template);
 	}
 	
 	/**
