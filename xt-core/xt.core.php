@@ -31,7 +31,7 @@ define('ATOM', 6);
 class xt{
 	private $core=array('fragment', 'getnode', 'switcher');
 	public function __construct($file=0, $is_string=0){
-		$this->dir=dirname(__FILE__);
+		$this->dir=dirname(__FILE__);# folder xt-core
 		$this->start_time=microtime(true);
 		$this->find_plugins();
 		$this->debug=false;
@@ -52,6 +52,8 @@ class xt{
 			$this->plugins[]=substr(basename($file, '.php'), 3);
 		}
 	}
+	
+
 	
 	/**
 	 * include plugins, only when necessary
@@ -99,6 +101,7 @@ class xt{
 		}else{
 			$this->template=$file;
 		}
+		$this->name=$file;
 		
 		$this->xml=new mydom();
 		
@@ -118,6 +121,17 @@ class xt{
 		$this->xml->formatOutput=true;
 		$this->xml->standalone=false;
 		$this->useXML=$this->xml();
+		
+		$this->preprocessor();
+	}
+	
+	/**
+	 * easy file preprocessor
+	 */
+	private function preprocessor(){
+		if(file_exists($this->name.'.php')){
+			require_once($this->name.'.php');
+		}
 	}
 	
 	private function add_entities_references(){
