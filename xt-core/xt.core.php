@@ -53,8 +53,6 @@ class xt{
 		}
 	}
 	
-
-	
 	/**
 	 * include plugins, only when necessary
 	 */
@@ -66,12 +64,7 @@ class xt{
 			}
 		}
 		if(in_array($name, $this->core)){
-			if($name=='fragment'){
-				if(!class_exists('fragment')){
-					require_once($this->dir.'/xt.fragment.php');
-				}
-				return new fragment($this);
-			}elseif(!isset($this->$name)){
+			if(!isset($this->$name)){
 				require_once($this->dir.'/xt.'.$name.'.php');
 				$this->$name=new $name($this);
 			}
@@ -404,8 +397,6 @@ class xt{
 		}
 	}
 	
-	
-	
 	/**
 	 * usuwa id wszystkich dzieci i danego obiektu
 	 * @param mixed object
@@ -426,8 +417,12 @@ class xt{
 	/**
 	 * głowna funkcja dodająca wartości/parametry, obsługująca pętle
 	 */
-	public function add($name, $value){
-		if($node=$this->getOneNode($name)){
+	public function add($name, $value, $loop=false){
+		if($loop){
+			foreach($this->getNode($name) as $node){
+				$this->add($node, $value);
+			}
+		}elseif($node=$this->getOneNode($name)){
 			if(is_array($value) && isset($value[0]) && is_array($value[0])){
 				$this->r($node, $value);
 			}elseif(is_array($value)){
@@ -445,9 +440,6 @@ class xt{
 			return false;
 		}
 	}
-	
-	
-	
 	
 	/**
 	 * smarty compatible
