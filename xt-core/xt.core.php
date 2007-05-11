@@ -415,14 +415,19 @@ class xt{
 	}
 	
 	/**
+	 * function add should add values to all nodes which match the css pattern
+	 */
+	public function add($name, $value){
+		foreach($this->getNode($name) as $node){
+			$this->addOne($node, $value);
+		}
+	}
+	
+	/**
 	 * głowna funkcja dodająca wartości/parametry, obsługująca pętle
 	 */
-	public function add($name, $value, $loop=false){
-		if($loop){
-			foreach($this->getNode($name) as $node){
-				$this->add($node, $value);
-			}
-		}elseif($node=$this->getOneNode($name)){
+	public function addOne($name, $value){
+		if($node=$this->getOneNode($name)){
 			if(is_array($value) && isset($value[0]) && is_array($value[0])){
 				$this->r($node, $value);
 			}elseif(is_array($value)){
@@ -499,17 +504,26 @@ class xt{
 	 * nadawanie atrybutów obiektowi
 	 * arguemtny w tablicy lub jako kolejene parametry funkcji
 	 */
-	public function set($node, $attributes){
+	public function set($name, $attributes){
+		if(!is_array($attributes)){
+			throw new xtException('Metoda set potrzebuje tablicy jako argumentu.', E_WARNING);
+		}
+		foreach($this->getNode($name) as $node){
+			$this->setOne($node, $attributes);
+		}
+	}
+	
+	public function setOne($node, $attributes){
 		if($node=$this->getOneNode($node)){
 			foreach($attributes as $attribute => $value){
-				if($value!==false){
-					if($attribute!='#text'){
+				if(is_string($attribute) && is_scalar($value)){
+					$value=(string)$value;
+					if($attribute!=='#text'){
 						$node->setAttribute($attribute, $value);
 					}else{
 						$this->appendText($node, $value);
 					}
 				}
-				
 			}
 		}else{
 			return false;

@@ -34,7 +34,7 @@ class xtException extends Exception{
 	 * display errors
 	 */
 	public function __toString(){
-		return '<p>Klasa <code>'.__CLASS__ . '</code> wyświetliła błąd wagi '.$this->code.': '.$this->message.'</p>';
+		return '<p>Błąd '.$this->getFile().':'.$this->getLine().' Klasa <code>'.__CLASS__ . '</code> wyświetliła błąd wagi '.$this->code.': '.$this->message.'</p>';
 	}
 }
 
