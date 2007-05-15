@@ -255,11 +255,25 @@ class xt{
 	 * @param domnode node
 	 */
 	public function removeParent($name){
+		if($this->is_node($name)){
+			return $this->removeOneParent($name);
+		}else{
+			$done=true;
+			foreach($this->getNode($name) as $node){
+				if(!$this->removeOneParent($node)){
+					$done=false;
+				}
+			}
+			return $done;
+		}
+	}
+	public function removeOneParent($name){
 		if($node=$this->getOneNode($name)){
 			foreach($node->childNodes as $child){
 				$node->parentNode->insertBefore($child->cloneNode(true), $node);
 			}
 			$this->remove($node);
+			
 			return true;
 		}else{
 			return false;
@@ -273,6 +287,20 @@ class xt{
 	 * @param array attributes
 	 */
 	public function replaceParent($name, $new_name, $attributes=0){
+		if($this->is_node($name)){
+			return $this->replaceOneParent($name, $new_name, $attributes=0);
+		}else{
+			$done=true;
+			foreach($this->getNode($name) as $node){
+				if(!$this->replaceOneParent($node, $new_name, $attributes=0)){
+					$done=false;
+				}
+			}
+			return $done;
+		}
+	}
+	
+	public function replaceOneParent($name, $new_name, $attributes=0){
 		if($node=$this->getOneNode($name)){
 			$old=$this->xml->createdocumentfragment();
 			foreach($node->childNodes as $child){
@@ -286,6 +314,18 @@ class xt{
 		}else{
 			return false;
 		}
+	}
+	
+	/**
+	 * remove namespace:
+	 * - remove nodes using removeParent
+	 * - remove namespace declaration 
+	 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~?
+	 */
+	public function removeNS($ns){
+		$this->removeParent($ns.'|*');
+		
+		$this->xml->getElementsByTagName('html')->item(0)->removeAttribute('xmlns:xt');
 	}
 	
 	/**
@@ -418,8 +458,16 @@ class xt{
 	 * function add should add values to all nodes which match the css pattern
 	 */
 	public function add($name, $value){
-		foreach($this->getNode($name) as $node){
-			$this->addOne($node, $value);
+		if($this->is_node($name)){
+			return $this->addOne($name, $value);
+		}else{
+			$done=true;
+			foreach($this->getNode($name) as $node){
+				if(!$this->addOne($node, $value)){
+					$done=false;
+				}
+			}
+			return $done;
 		}
 	}
 	
@@ -429,15 +477,15 @@ class xt{
 	public function addOne($name, $value){
 		if($node=$this->getOneNode($name)){
 			if(is_array($value) && isset($value[0]) && is_array($value[0])){
-				$this->r($node, $value);
+				return $this->r($node, $value);
 			}elseif(is_array($value)){
-				$this->set($node, $value);
+				return $this->set($node, $value);
 			}elseif(is_scalar($value)){
-				$this->appendText($node, (string)$value);
+				return $this->appendText($node, (string)$value);
 			}elseif($this->is_node($value)){
-				$node->appendChild($value);
+				return $node->appendChild($value);
 			}elseif($value instanceof fragment){
-				$node->appendChild($value->s);
+				return $node->appendChild($value->s);
 			}else{
 				throw new xtException('Niepoprawny drugi parametr metody <code>add</code>: <code>'.htmlspecialchars(print_r($value, 1)).'</code>', E_WARNING);
 			}
@@ -445,29 +493,32 @@ class xt{
 			return false;
 		}
 	}
-	
-	/**
-	 * smarty compatible
-	 */
-	public function assign($name, $value){
-		$this->add($name, $value);
-	}
 
 	/**
 	 * pomocnicza funkcja głównej - zagnieżdżone pętle
 	 */
 	private function r($node, $all){
+		$done=true;
 		foreach($all as $row){
-			$clone=$node->cloneNode(true);
+			if(!$clone=$node->cloneNode(true)){
+				$done=false;
+			}
 			foreach($row as $key => $value){
 				if($tt=$this->getOneNode($key, $clone)){
-					$this->add($tt, $value);
+					if(!$this->add($tt, $value)){
+						$done=false;
+					}
 				}
 			}
 			$this->remove_id($clone);
-			$node->parentNode->insertBefore($clone, $node);
+			if(!$node->parentNode->insertBefore($clone, $node)){
+				$done=false;
+			}
 		}
-		$node->parentNode->removeChild($node);
+		if(!$node->parentNode->removeChild($node)){
+			$done=false;
+		}
+		return $done;
 	}
 	
 	/**
@@ -505,15 +556,23 @@ class xt{
 	 * arguemtny w tablicy lub jako kolejene parametry funkcji
 	 */
 	public function set($name, $attributes){
-		if(!is_array($attributes)){
-			throw new xtException('Metoda set potrzebuje tablicy jako argumentu.', E_WARNING);
-		}
-		foreach($this->getNode($name) as $node){
-			$this->setOne($node, $attributes);
+		if($this->is_node($name)){
+			return $this->setOne($name, $attributes);
+		}else{
+			$done=true;
+			foreach($this->getNode($name) as $node){
+				if(!$this->setOne($node, $attributes)){
+					$done=false;
+				}
+			}
+			return $done;
 		}
 	}
 	
 	public function setOne($node, $attributes){
+		if(!is_array($attributes)){
+			throw new xtException('Metoda <code>set</code> potrzebuje tablicy jako argumentu.', E_WARNING);
+		}
 		if($node=$this->getOneNode($node)){
 			foreach($attributes as $attribute => $value){
 				if(is_string($attribute) && is_scalar($value)){
@@ -552,18 +611,24 @@ class xt{
 	 * zwraca usuwane dziecko
 	 */
 	public function remove($name){
+		if($this->is_node($name)){
+			return $this->removeOne($name);
+		}else{
+			$done=true;
+			foreach($this->getNode($name) as $node){
+				if(!$this->removeOne($node)){
+					$done=false;
+				}
+			}
+			return $done;
+		}
+	}
+	public function removeOne($name){
 		if($node=$this->getOneNode($name)){
 			return $node->parentNode->removeChild($node);
 		}else{
 			return false;
 		}
-	}
-	
-	/**
-	 * alias funkcji remove
-	 */
-	public function delete($name){
-		$this->remove($name);
 	}
 	
 	/**

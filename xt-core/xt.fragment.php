@@ -50,5 +50,19 @@ class fragment extends xt{
 		$query = './descendant::'.$tag;
 		return $xpath->query($query, $parent);
 	}
+	
+	/**
+	 * display fragment
+	 */
+	public function display($mime_compability_with_core_dont_use=0){
+		return $this->xml->savexml($this->s);
+	}
+	
+	/**
+	 * if conversion to string - display
+	 */
+	public function __toString(){
+		return $this->display();
+	}
 }
 ?>

@@ -58,8 +58,10 @@ class form{
 	}
 	
 	public function memory($css){
+		/* post */
+		
 		/* sprawdź wszystkie inputy */
-		foreach($this->core->getnode($css.' input[name][type="text"]') as $input){
+		foreach($this->core->getnode($css.'[method="post"] input[name][type="text"]') as $input){
 			$name=$input->getAttribute('name');
 			if(isset($_POST[$name])){
 				$input->setAttribute('value',$_POST[$name]);
@@ -67,7 +69,7 @@ class form{
 		}
 		
 		/* sprawdź pola textarea */
-		foreach($this->core->getnode($css.' textarea[name]') as $textarea){
+		foreach($this->core->getnode($css.'[method="post"] textarea[name]') as $textarea){
 			$name=$textarea->getAttribute('name');
 			if(isset($_POST[$name])){
 				$textarea->nodeValue=$_POST[$name];
@@ -75,10 +77,37 @@ class form{
 		}
 
 		/* sprawdź pola select */
-		foreach($this->core->getnode($css.' select[name]') as $select){
+		foreach($this->core->getnode($css.'[method="post"] select[name]') as $select){
 			$name=$select->getAttribute('name');
 			if(isset($_POST[$name])){
-				if($option=$this->core->getOneNode($css.' select[name="'.$name.'"] option[value="'.$_POST[$name].'"]')){
+				if($option=$this->core->getOneNode($css.'[method="post"] select[name="'.$name.'"] option[value="'.$_POST[$name].'"]')){
+					$option->setAttribute('selected', 'selected');
+				}
+			}
+		}
+		
+		/* to samo, tylko get */
+		/* sprawdź wszystkie inputy */
+		foreach($this->core->getnode($css.'[method="get"] input[name][type="text"]') as $input){
+			$name=$input->getAttribute('name');
+			if(isset($_GET[$name])){
+				$input->setAttribute('value',$_GET[$name]);
+			}
+		}
+		
+		/* sprawdź pola textarea */
+		foreach($this->core->getnode($css.'[method="get"] textarea[name]') as $textarea){
+			$name=$textarea->getAttribute('name');
+			if(isset($_GET[$name])){
+				$textarea->nodeValue=$_GET[$name];
+			}
+		}
+
+		/* sprawdź pola select */
+		foreach($this->core->getnode($css.'[method="get"] select[name]') as $select){
+			$name=$select->getAttribute('name');
+			if(isset($_GET[$name])){
+				if($option=$this->core->getOneNode($css.'[method="get"] select[name="'.$name.'"] option[value="'.$_GET[$name].'"]')){
 					$option->setAttribute('selected', 'selected');
 				}
 			}
