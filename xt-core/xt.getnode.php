@@ -155,6 +155,7 @@ class getNode{
 					// dowolny obiekt o dowolnym namespace
 				}
 			}
+			
 			$name=$match[0];
 			
 			$str=substr($str, strlen($match[0]));
@@ -177,7 +178,7 @@ class getNode{
 		$this->xpath.=$glue.'*';
 		
 		if(!empty($this->child)){
-			$this->xpath.='/../*['.implode(' and ', $this->child).']/self::'.$name;
+			$this->xpath.='/../*['.implode(' and ', $this->child).']/self::*'; # change from $name to *
 		}
 		
 		if(!empty($this->type)){
@@ -407,6 +408,11 @@ class getNode{
 					$$nazwa=$position.'='.$b;
 				}
 			break;
+			
+			default:
+				# ERROR;
+				# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			break;
 		}
 		
 		if(isset($type) && strlen($type)>0){
@@ -443,7 +449,7 @@ class getNode{
 				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';
 			}
 			
-			//print_r($results);
+			#print_r($results->item(1));
 			
 			return $results;
 		}

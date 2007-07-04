@@ -1,1 +1,3 @@
-*	dodać ostrzeżenie jeśli szablon został wyświetlony, a ktoś chce coś z nim robić* dodać modyfikatory jak w smarty
+*	dodać ostrzeżenie jeśli szablon został wyświetlony, a ktoś chce coś z nim robić
+*	dodać wewnętrzną funkcję setAttribute, która będzie uwzględniać atrybut #text
+*	clean mess with entities and namespaces

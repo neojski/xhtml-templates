@@ -199,6 +199,9 @@ class xt{
 		echo '</ul></div>';
 		
 		/************* xpath tests *****************/
+		
+		$this->execute_modifiers();
+		
 		foreach($this->getElementsByClassName('remove_id') as $node){
 			$node->removeAttribute('id');
 		}
@@ -246,8 +249,24 @@ class xt{
 		}
 	}
 	
-	public function __tostring(){
+	public function __toString(){
 		return $this->display(0);
+	}
+	
+	/**
+	 * modifier function like smarty's
+	 */
+	private $modifiers=array();
+	public function modifier($node, $attribute, $function){
+		$this->modifiers[]=array($node, $attribute, $function);
+	}
+	
+	public function execute_modifiers(){
+		foreach($this->modifiers as $array){
+			foreach($this->getNode($array[0]) as $node){
+				$node->setAttribute($array[1], call_user_func($array[2],$node->getAttribute($array[1])));
+			}
+		}
 	}
 	
 	/**

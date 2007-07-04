@@ -62,7 +62,7 @@ class fragment extends xt{
 	 * if conversion to string - display
 	 */
 	public function __toString(){
-		return $this->display();
+		return $this->display(0);
 	}
 }
 ?>
