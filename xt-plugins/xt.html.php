@@ -48,10 +48,6 @@ class html /*extends xml*/{
 	}
 }
 
-/*
-	TODO:
-	* dodać obsługę i automatyczny wybór między _GET i _POST
-*/
 class form{
 	public function __construct($html){
 		$this->core=$html->core;
