@@ -26,6 +26,7 @@
 class node{
 	public function __construct(&$core, $css){
 		$this->core=$core;
+		$this->css=$css;
 		
 		$this->node=$core->getonenode($css);
 	}
@@ -37,10 +38,29 @@ class node{
 	
 	public function set($attributes){
 		$this->core->set($this->node, $attributes);
+		return $this;
 	}
 	
 	public function remove(){
 		$this->core->remove($this->node);
+		return $this;
+	}
+	
+	/*
+		read as ,,insertBeforeMe''
+	*/
+	public function insertBefore($new_node){
+		$this->core->insertBefore($this->node, $new_node);
+		return $this;
+	}
+
+	public function insertAfter($new_node){
+		$this->core->insertAfter($this->node, $new_node);
+		return $this;
+	}
+	
+	public function node($css){
+		return new node($this->core, $this->css.' '.$css);
 	}
 }
 ?>
