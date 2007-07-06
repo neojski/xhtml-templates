@@ -199,6 +199,21 @@ class xt{
 		return $xhtml;
 	}
 	
+	
+	private function magic_classes(){
+		foreach($this->getElementsByClassName('remove_id') as $node){
+			$node->removeAttribute('id');
+		}
+		
+		foreach($this->getElementsByClassName('remove_parent') as $node){
+			$this->removeParent($node);
+		}
+		
+		foreach($this->getElementsByClassName('remove_class') as $node){
+			$node->removeAttribute('class');
+		}
+	}
+	
 	/**
 	 * display
 	 * @param bool debug (if true displays plain source code)
@@ -219,20 +234,10 @@ class xt{
 		/************* xpath tests *****************/
 		
 		$this->execute_modifiers();
+		$this->magic_classes();
 		
-		foreach($this->getElementsByClassName('remove_id') as $node){
-			$node->removeAttribute('id');
-		}
 		
-		foreach($this->getElementsByClassName('remove_parent') as $node){
-			$this->removeParent($node);
-		}
-		
-		foreach($this->getElementsByClassName('remove_class') as $node){
-			$node->removeAttribute('class');
-		}
-		
-		$this->add($this->body, '<p id="stopka">Ta strona została wygenerowana właśnie dzięki xt. Czas wykonywania skryptu to '.(microtime(true)-$this->start_time).'s</p>');
+		$this->add($this->body, '<p id="stopka">'.(microtime(true)-$this->start_time).'</p>');
 		
 		$mime_tab=array(
 			2 => 'application/xhtml+xml',
@@ -362,7 +367,7 @@ class xt{
 	public function removeNS($ns){
 		$this->removeParent($ns.'|*');
 		
-		$this->xml->getElementsByTagName('html')->item(0)->removeAttribute('xmlns:xt');
+		$this->root->removeAttribute('xmlns:'.$ns);
 	}
 	
 	/**
@@ -613,15 +618,24 @@ class xt{
 			foreach($attributes as $attribute => $value){
 				if(is_string($attribute) && is_scalar($value)){
 					$value=(string)$value;
-					if($attribute!=='#text'){
-						$node->setAttribute($attribute, $value);
-					}else{
-						$this->appendText($node, $value);
-					}
+					$this->setAttribute($node, $attribute, $value);
 				}
 			}
 		}else{
 			return false;
+		}
+	}
+	
+	/**
+	 * function setting attribute with magic attribute #text
+	 */
+	public function setAttribute($node, $attribute, $value){
+		if($this->is_node($node)){
+			if($attribute!=='#text'){
+				$node->setAttribute($attribute, $value);
+			}else{
+				$this->appendText($node, $value);
+			}
 		}
 	}
 	
@@ -821,5 +835,11 @@ class xt{
 		$switcher->load($objects);
 		return $switcher;
 	}
+	
+	public function node($css){
+		return new node($this, $css);
+	}
 }
+
+include('node.class.php');
 ?>
