@@ -28,7 +28,7 @@ class node{
 		$this->core=$core;
 		$this->css=$css;
 		
-		$this->node=$core->getonenode($css);
+		$this->node=$this->core->getonenode($css);
 	}
 	
 	public function add($str){
@@ -61,6 +61,23 @@ class node{
 	
 	public function node($css){
 		return new node($this->core, $this->css.' '.$css);
+	}
+	
+	public function __get($name){
+		if($name=='value'){
+			return $this->node->ownerDocument->savexml($this->node);
+		}
+	}
+	
+	public function __set($name, $value){
+		$this->$name=$value;
+		
+		if($name=='value'){
+			$this->add($value);
+			unset($this->value); // unset, to call every time __set function
+		}
+		
+		return $this;
 	}
 }
 ?>
