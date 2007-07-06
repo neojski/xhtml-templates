@@ -94,14 +94,6 @@ class getNode{
 		*/
 		
 		if(preg_match('#^(?:([a-z]*|\*)(\|))?('.$r_name.'|\*)|\*$#', $str, $match)){
-			// tak, mamy nazwę
-			
-			/*
-				[1]=>namespace
-				[2]=>|
-				[3]=>nodeName
-			*/
-			
 			/*
 				n summary:
 
@@ -116,23 +108,19 @@ class getNode{
 				
 				NOTE:
 				E will be always evuivalent to *|E, because we don't set the default namespace
-    			*/
-    			/* wszystko powinno odbywać się normalnie, czyli namespace:nodeName, jednak wymaga to przypisywania wszystkim namespace odpowiedniego skrótu, za pomocą DOMXPath->registerNamespace(), a potem kombinacji z tym, jeśli wybieramy dowolny namespace*/
-			
+			*/
+			/*
+				[1]=>namespace
+				[2]=>|
+				[3]=>nodeName
+			*/
+ 
 			if(!empty($match[2])){
-				
 				if(!empty($match[1])){
 					//mamy namespace
 					if($match[1]!=='*'){
 						//ustalony namespace
-						
-						if($match[3]!=='*'){
-							// mamy nazwę
-							$this->type[]='name()="'.$match[1].':'.$match[3].'"';
-						}else{
-							// dowolny obiekt o danym namespace
-							$this->type[]='substring(name(), 1, '.(strlen($match[1])+1).')="'.$match[1].':"';
-						}
+						$name=str_replace('|', ':', $match[0]); # normalnie - namespace:node_name
 					}else{
 						//dowolny namespace
 						if($match[3]!=='*'){
@@ -144,19 +132,27 @@ class getNode{
 					}
 				}else{
 					//elementy z domyślnym namespace
-					$this->type[]='name()="'.$match[3].'"';
+					$name='default:'.str_replace('|', ':', $match[3]);
+					# czyli default:node_name (default to namespace deklarowany w core)
 				}
 			}else{
 				//brak namespace
-				if($match[3]!=='*'){
-					// mamy nazwę
-					$this->type[]='local-name()="'.$match[3].'"';
+				if($this->core->xpath->defaultNamespace){
+					// jest jakiś domyślny
+					$name='default:'.str_replace('|', ':', $match[3]);
 				}else{
-					// dowolny obiekt o dowolnym namespace
+					if($match[3]!=='*'){
+						// mamy nazwę
+						$this->type[]='local-name()="'.$match[3].'"';
+					}else{
+						// dowolny obiekt o dowolnym namespace
+					}
 				}
 			}
 			
-			$name=$match[0];
+			if(!isset($name)){
+				$name='*';
+			}
 			
 			$str=substr($str, strlen($match[0]));
 		}
@@ -175,10 +171,10 @@ class getNode{
 		}
 		
 		$glue=$this->getglue($glue);
-		$this->xpath.=$glue.'*';
+		$this->xpath.=$glue.$name;
 		
 		if(!empty($this->child)){
-			$this->xpath.='/../*['.implode(' and ', $this->child).']/self::*'; # change from $name to *
+			$this->xpath.='/../*['.implode(' and ', $this->child).']/self::'.$name;
 		}
 		
 		if(!empty($this->type)){
@@ -435,15 +431,11 @@ class getNode{
 		if(empty($this->xpath)){
 			return null;
 		}else{
-			if(!isset($this->xpo)){
-				$this->xpo = new DOMXPath($this->xml);
-			}
-
 			if(is_int($count)){
 				//$this->xpath.='[position()='.$count.']';
 			}
 			
-			$results = $this->xpo->query($this->xpath, $this->parent);
+			$results = $this->core->xpath->query($this->xpath, $this->parent);
 			
 			if($this->debug){
 				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';

@@ -99,7 +99,7 @@ class xt{
 		$this->xml=new mydom();
 		
 		$this->check_encoding();
-		$this->check_namespaces();
+		
 		
 		$this->add_entities_references();
 	
@@ -114,6 +114,9 @@ class xt{
 		$this->xml->formatOutput=true;
 		$this->xml->standalone=false;
 		$this->useXML=$this->xml();
+		
+		$this->xpath=new DOMXPath($this->xml);
+		$this->check_namespaces();
 		
 		$this->preprocessor();
 	}
@@ -158,7 +161,23 @@ class xt{
 	private function check_namespaces(){
 		preg_match_all('#xmlns:[a-z]+="[^"]+"#', $this->template, $match);
 		$namespaces=$match[0];
-		array_shift($namespaces);
+		
+		# register all namespaces
+		foreach($namespaces as $string){
+			preg_match('#xmlns:(.*?)=#', $string, $prefix);
+			preg_match('#"(.*?)"#', $string, $uri);
+			
+			$this->xpath->registerNamespace($prefix[1], $uri[1]);
+		}
+		
+		# register default namespace
+		if(strlen($this->root->lookupNamespaceURI(null))>0){
+			$this->xpath->defaultNamespace=true;
+			$this->xpath->registerNamespace('default', $this->root->lookupNamespaceURI(null));
+		}else{
+			$this->xpath->defaultNamespace=false;
+		}
+		
 		$this->namespaces=implode(' ', $namespaces);
 	}
 	
@@ -188,9 +207,8 @@ class xt{
 	 */	
 	public function display($mime=0){
 		/************* xpath tests *****************
-		$xpath = new DOMXPath($this->xml);
 		$query = '//node()[local-name()="div"]';
-		$objects = $xpath->query($query);
+		$objects = $this->xpath->query($query);
 		
 		echo '<div style="border:2px solid">Obiekty:<ul>';
 		foreach($objects as $object){
@@ -462,9 +480,8 @@ class xt{
 	 */
 	public function remove_id($name){
 		if($node=$this->getOneNode($name)){
-			$xpath = new DOMXPath($this->xml);
 			$query = './descendant-or-self::*[@id]';
-			$entries = $xpath->query($query, $node);
+			$entries = $this->xpath->query($query, $node);
 			foreach($entries as $node){
 				$node->removeAttribute('id');
 			}
@@ -546,7 +563,7 @@ class xt{
 	 */
 	public function loop($name, $count, $delete_sample=true){
 		if($node=$this->getOneNode($name)){
-			$str=$this->xml->savexml($node);
+			$str=$node->ownerDocument->savexml($node);
 			$count=(int)$count;
 			if($count>0){
 				for($i=0; $i<$count; $i++){
@@ -695,7 +712,7 @@ class xt{
 	 */
 	public function clone_node($node, $remove_parent=0){
 		if($node=$this->getOneNode($node)){
-			$fragment=$this->fragment($this->savexml($node));
+			$fragment=$this->fragment($node->ownerDocument->savexml($node));
 			return $fragment;
 		}else{
 			return null;
@@ -740,8 +757,7 @@ class xt{
 		}
 		$query=substr($query, 0, -4);
 		$query.=']';
-		$xpath = new DOMXPath($this->xml);
-		return $xpath->query($query, $parent);
+		return $this->xpath->query($query, $parent);
 	}
 	
 	/**
@@ -778,9 +794,8 @@ class xt{
 		if(!$node_name){
 			$node_name='*';
 		}
-		$xpath = new DOMXPath($this->xml);
 		$query = './descendant-or-self::'.$node_name.'[@id="'.$id.'"]';
-		$entries = $xpath->query($query, $parent);
+		$entries = $this->xpath->query($query, $parent);
 		return $entries->item(0);
 	}
 	
