@@ -101,7 +101,7 @@ class xt{
 		$this->check_encoding();
 		
 		
-		$this->add_entities_references();
+		$this->entities();
 	
 		$this->xml->loadxml($this->template);
 		
@@ -130,14 +130,17 @@ class xt{
 		}
 	}
 	
-	private function add_entities_references(){
-		$this->entities_def='';
-		preg_match_all('#&[a-z]+;#', $this->template, $entities);
-		foreach($entities[0] as $entity){
-			$this->entities_def.='<!ENTITY '.substr($entity, 1, -1).' "'.html_entity_decode($entity, ENT_QUOTES, 'utf-8').'">';
+	private function entities(){
+		$references='';
+		foreach(glob($this->dir.'/entities-ref/*.ent') as $ref){
+			$references.=file_get_contents($ref);
 		}
 		
-		$this->template=preg_replace('#(<!DOCTYPE[^>]+)>#', '$1 ['.$this->entities_def.']>', $this->template);
+		preg_match_all('#<!ENTITY\s+([a-zA-z0-9]+).*?"(&\#[0-9]+;)"#s', $references, $matches);
+		$matches[1]=array_map(create_function('$a', 'return \'&\'.$a.\';\';'), $matches[1]);
+		$this->template=str_replace($matches[1], $matches[2], $this->template);
+		
+		// javascript:alert('&#'+'niedozwolony_znak'.charCodeAt(0)+';');
 	}
 	
 	/**
@@ -741,7 +744,14 @@ class xt{
 	 *
 	 * if condition isn't true - delete object
 	 */
-	public function condition($condition, $object){
+	public function condition(){
+		if(func_num_args()>0 && func_num_args()%2==1){
+			for($i=0, $count=func_num_args(); $i<$count; $i+=2){
+				if(func_get_arg($i-1)){
+					
+				}
+			}
+		}
 		if($node=$this->getOneNode($object)){
 			if(!$condition){
 				$this->remove($node);
@@ -840,6 +850,4 @@ class xt{
 		return new node($this, $css);
 	}
 }
-
-include('node.class.php');
 ?>
