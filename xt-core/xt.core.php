@@ -105,8 +105,6 @@ class xt{
 	
 		$this->xml->loadxml($this->template);
 		
-		
-		
 		$this->body=$this->xml->getElementsByTagName('body')->item(0);
 		$this->head=$this->xml->getElementsByTagName('head')->item(0);
 		$this->root=$this->xml->documentElement;
@@ -180,7 +178,6 @@ class xt{
 		}else{
 			$this->xpath->defaultNamespace=false;
 		}
-		
 		$this->namespaces=implode(' ', $namespaces);
 	}
 	
@@ -201,7 +198,6 @@ class xt{
 		}
 		return $xhtml;
 	}
-	
 	
 	private function magic_classes(){
 		foreach($this->getElementsByClassName('remove_id') as $node){
@@ -239,8 +235,7 @@ class xt{
 		$this->execute_modifiers();
 		$this->magic_classes();
 		
-		
-		$this->add($this->body, '<p id="stopka">'.(microtime(true)-$this->start_time).'</p>');
+		//$this->add($this->body, '<p id="stopka">'.(microtime(true)-$this->start_time).'</p>');
 		
 		$mime_tab=array(
 			2 => 'application/xhtml+xml',
@@ -250,28 +245,36 @@ class xt{
 			'application/rss+xml',
 			'application/atom+xml'
 		);
+		
+		
+		$this->output=$this->xml->savexml();
+		
+		// remove namespace...
+		foreach($this->removedNamespaces as $ns){
+			$this->output=preg_replace('#\s+xmlns:'.$ns.'=".*?"#', '', $this->output);
+		}
 
 		if($this->debug){
-			echo '<pre><code>'.htmlspecialchars($this->xml->savexml()).'</code></pre>';
+			echo '<pre><code>'.htmlspecialchars($this->output).'</code></pre>';
 		}elseif($mime==0){
-			return $this->xml->savexml();
+			return $this->output;
 		}elseif($mime==1){
 			if($this->useXML){
 				if(!headers_sent()){
 					header('Content-Type: application/xhtml+xml; charset='.$this->encoding);
 				}
-				echo $this->xml->savexml();
+				echo $this->output;
 			}else{
 				if(!headers_sent()){
 					header('Content-Type: text/html; charset='.$this->encoding);
 				}
-				echo preg_replace('#<\?xml[^?]+\?>#s', '', $this->xml->saveXML(), 1);
+				echo preg_replace('#<\?xml[^?]+\?>#s', '', $this->output, 1);
 			}
 		}else{
 			if(!headers_sent()){
 				header('Content-Type: '.$mime_tab[$mime].'; charset='.$this->encoding);
 			}
-			echo $this->xml->savexml();
+			echo $this->output;
 		}
 	}
 	
@@ -362,13 +365,17 @@ class xt{
 	}
 	
 	/**
-	 * remove namespace:
-	 * - remove nodes using removeParent
-	 * - remove namespace declaration 
-	 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~?
+	 * remove namespace
 	 */
-	public function removeNS($ns){
-		$this->removeParent($ns.'|*');
+	private $removedNamespaces=array();
+	public function removeNS($ns, $remove_content=false){
+		if(!$remove_content){
+			$this->removeParent($ns.'|*');
+		}else{
+			$this->remove($ns.'|*');
+		}
+		
+		$this->removedNamespaces[]=$ns;
 		
 		$this->root->removeAttribute('xmlns:'.$ns);
 	}
@@ -522,20 +529,44 @@ class xt{
 		if($node=$this->getOneNode($name)){
 			if(is_array($value) && isset($value[0]) && is_array($value[0])){
 				return $this->r($node, $value);
-			}elseif(is_array($value)){
-				return $this->set($node, $value);
 			}elseif(is_scalar($value)){
 				return $this->appendText($node, (string)$value);
 			}elseif($this->is_node($value)){
 				return $node->appendChild($value);
 			}elseif($value instanceof fragment){
 				return $node->appendChild($value->s);
+			}elseif($value[0] instanceof xt_loop){
+				$this->loop_xt($node, $value);
+			}elseif(is_array($value)){
+				return $this->set($node, $value);
 			}else{
 				throw new xtException('Niepoprawny drugi parametr metody <code>add</code>: <code>'.htmlspecialchars(print_r($value, 1)).'</code>', E_WARNING);
 			}
 		}else{
 			return false;
 		}
+	}
+	
+	/**
+	 * loop_xt
+	 */
+	public function loop_xt($node, $value){
+		
+		
+		foreach($value as $loop_xt){
+			$clone = $node->cloneNode(true);
+			// dodaj wszystko z add_array
+			foreach($loop_xt->add_array as $ref => $value){
+				$this->add($this->getOneNode($ref, $clone), $value);
+			}
+			// dodaj wszystko z set_array
+			foreach($loop_xt->set_array as $ref => $value){
+				$this->set($this->getOneNode($ref, $clone), $value);
+			}
+			$node->parentNode->insertBefore($clone);
+		}
+		
+		$this->remove($node);
 	}
 
 	/**
@@ -848,6 +879,18 @@ class xt{
 	
 	public function node($css){
 		return new node($this, $css);
+	}
+}
+
+class xt_loop{
+	public $add_array=array();
+	public function add($ref, $value){
+		$this->add_array[$ref]=$value;
+	}
+	
+	public $set_array=array();
+	public function set($ref, $value){
+		$this->set_array[$ref]=$value;
 	}
 }
 ?>
