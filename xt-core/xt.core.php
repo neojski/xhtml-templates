@@ -200,7 +200,7 @@ class xt{
 	}
 	
 	private function magic_classes(){
-		foreach($this->getElementsByClassName('remove_id') as $node){
+		foreach($this->getElementsByClassName('remove_id') as $node){ echo 'kupa';
 			$node->removeAttribute('id');
 		}
 		
@@ -232,7 +232,7 @@ class xt{
 		
 		/************* xpath tests *****************/
 		
-		$this->execute_modifiers();
+		//$this->execute_modifiers();
 		$this->magic_classes();
 		
 		//$this->add($this->body, '<p id="stopka">'.(microtime(true)-$this->start_time).'</p>');
@@ -806,12 +806,13 @@ class xt{
 		if(!is_array($class)){
 			$class=array($class);
 		}
-		$query = $name.'[';
+		$query = '//'.$name.'[';
 		foreach($class as $c){
 			$query.='contains(concat(" ", @class, " "), " '.$c.' ") and ';
 		}
 		$query=substr($query, 0, -4);
 		$query.=']';
+		
 		return $this->xpath->query($query, $parent);
 	}
 	
