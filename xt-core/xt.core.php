@@ -200,7 +200,7 @@ class xt{
 	}
 	
 	private function magic_classes(){
-		foreach($this->getElementsByClassName('remove_id') as $node){ echo 'kupa';
+		foreach($this->getElementsByClassName('remove_id') as $node){
 			$node->removeAttribute('id');
 		}
 		
