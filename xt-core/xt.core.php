@@ -202,6 +202,7 @@ class xt{
 	private function magic_classes(){
 		foreach($this->getElementsByClassName('remove_id') as $node){
 			$node->removeAttribute('id');
+			$node->removeAttribute('class');
 		}
 		
 		foreach($this->getElementsByClassName('remove_parent') as $node){
