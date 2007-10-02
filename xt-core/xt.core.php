@@ -676,7 +676,11 @@ class xt{
 			if($attribute!=='#text'){
 				$node->setAttribute($attribute, $value);
 			}else{
-				$this->appendText($node, $value);
+				$child = $this->text2html($value);
+				while($node->hasChildNodes()){
+					$node->removeChild($node->firstChild);
+				}
+				$node->appendChild($child);
 			}
 		}
 	}
