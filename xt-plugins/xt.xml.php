@@ -112,7 +112,7 @@ class xml{
 	 * @param mixed
 	 * @return bool is_dom_object
 	 */
-	protected function is_node($node){
+	public function is_node($node){
 		return substr(print_r($node,true),0,3)==='DOM';
 	}
 	
