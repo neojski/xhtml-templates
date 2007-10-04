@@ -34,6 +34,9 @@ class getNode{
 	}
 	
 	public function get($str, $parent=0, $n=false){
+		if(!is_string($str)){
+			return array();
+		}
 		$this->parent=$parent?$parent:$this->root;
 		if($this->method===2){
 			$this->xpath='.';
