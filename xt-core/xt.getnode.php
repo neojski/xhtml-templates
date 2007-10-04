@@ -93,7 +93,7 @@ class getNode{
 			koniec listy wyrażeń
 		*/
 		
-		if(preg_match('#^(?:([a-z]*|\*)(\|))?('.$r_name.'|\*)|\*$#', $str, $match)){
+		if(preg_match('#^(?:([a-z]*|\*)(\|))?('.$r_name.'|\*)|\*$#i', $str, $match)){
 			/*
 				n summary:
 
@@ -159,10 +159,10 @@ class getNode{
 			$name='*';
 		}
 		
-		if(!preg_match('#^(?:'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.'|'.$r_negation.')*$#', $str)){
+		if(!preg_match('#^(?:'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.'|'.$r_negation.')*$#i', $str)){
 			die('niepoprawny format <code>'.$str.'</code>');
 		}
-		preg_match_all('#('.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_negation.'|'.$r_pseudo.')#', $str, $match);
+		preg_match_all('#('.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_negation.'|'.$r_pseudo.')#i', $str, $match);
 		
 		if(empty($match[0])){
 			// nothing ?
@@ -264,7 +264,7 @@ class getNode{
 	}
 	
 	private function g_attribute($attribute, $not=false){
-		preg_match('#\[(.*?|\#text)(?:([~^$*|]?)="([^"]+)")?\]#', $attribute, $match);
+		preg_match('#\[(.*?|\#text)(?:([~^$*|]?)="([^"]+)")?\]#i', $attribute, $match);
 		
 		if($match[1]=='#text'){ // magiczny atrybut oznaczający zawartość tekstową
 			$attribute='.';
@@ -310,7 +310,7 @@ class getNode{
 	}
 	
 	private function g_pseudoclass($class, $not){
-		preg_match('#^(\:[a-z-]+)(?:\((.*?)\))?$#', $class, $match);
+		preg_match('#^(\:[a-z-]+)(?:\((.*?)\))?$#i', $class, $match);
 		
 		//print_r($match);
 		
@@ -376,7 +376,7 @@ class getNode{
 					$a=2;
 					$b=1;
 				}else{
-					if(preg_match('#(-?(\d+)?)n#', $param, $a)){
+					if(preg_match('#(-?(\d+)?)n#i', $param, $a)){
 						if(empty($a[1])){
 							$a=1;
 						}elseif(empty($a[2])){
@@ -388,7 +388,7 @@ class getNode{
 						$a=null;
 					}
 					
-					preg_match('#(-?\d+)(?!n)#', $param, $b);
+					preg_match('#(-?\d+)(?!n)#i', $param, $b);
 					if(empty($b[1])){
 						$b=0;
 					}else{
