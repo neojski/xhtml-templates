@@ -155,6 +155,8 @@ class getNode{
 			}
 			
 			$str=substr($str, strlen($match[0]));
+		}else{
+			$name='*';
 		}
 		
 		if(!preg_match('#^(?:'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.'|'.$r_negation.')*$#', $str)){
