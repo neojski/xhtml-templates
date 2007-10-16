@@ -28,5 +28,7 @@ require_once('xt-core/xt.core.php');
 require_once('xt-core/xt.xt-loop.php');
 require_once('xt-plugins/xt.xml.php');
 
+require_once('xt-core/css2xpath.php');
+
 
 ?>

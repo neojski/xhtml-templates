@@ -198,11 +198,11 @@ class xml{
 		if($this->is_node($name)){
 			return $name;
 		}else{
-			$str=$this->core->getnode;
+			$query = new css2xpath($name, $this->core->xpath->defaultNamespace);
 			if(!$parent){
 				$parent=$this->core->root;
 			}
-			return $str->get($name, $parent, $count);
+			return $this->core->xpath->query($query, $parent);
 		}
 	}
 	

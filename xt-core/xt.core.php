@@ -31,7 +31,6 @@ define('ATOM', 6);
 class xt{
 	private $core = array(
 		'fragment',
-		'getnode',
 		'switcher'
 	);
 	private $dir; // xt-core folder
@@ -148,7 +147,10 @@ class xt{
 			$this->template='<?xml version="1.0" encoding="'.$encoding[1].'"?>'.$this->template;
 			$this->encoding=$encoding[1];
 		}else{
-			throw new xtException('Brak ustawionego kodowania!');
+			// wrzuć domyślne utf-8
+			$this->template='<?xml version="1.0" encoding="utf-8"?>'.$this->template;
+			$this->encoding='utf-8';
+			//throw new xtException('Brak ustawionego kodowania!');
 		}
 	}
 	
@@ -169,10 +171,10 @@ class xt{
 		
 		# register default namespace
 		if(strlen($this->root->lookupNamespaceURI(null))>0){
-			$this->xpath->defaultNamespace=true;
+			$this->xpath->defaultNamespace = true;
 			$this->xpath->registerNamespace('default', $this->root->lookupNamespaceURI(null));
 		}else{
-			$this->xpath->defaultNamespace=false;
+			$this->xpath->defaultNamespace = false;
 		}
 		$this->namespaces=implode(' ', $namespaces);
 	}
@@ -229,8 +231,10 @@ class xt{
 	 */	
 	public function display($mime=0){
 		/************* xpath tests *****************
-		$query = '//node()[local-name()="div"]';
+		$query = '//*:d';
 		$objects = $this->xpath->query($query);
+		
+		//echo $objects->item(0)->lookupNamespaceURI(null);
 		
 		echo '<div style="border:2px solid">Obiekty:<ul>';
 		foreach($objects as $object){

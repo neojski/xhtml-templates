@@ -51,6 +51,10 @@ class node{
 		return $this;
 	}
 	
+	public function style($css){
+		$this->css($css);
+	}
+	
 	/*
 		read as ,,insertBeforeMe''
 	*/

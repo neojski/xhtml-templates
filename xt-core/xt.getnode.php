@@ -22,68 +22,24 @@
  *	License along with this library; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-class getNode{
-	public function __construct(&$xt){
-		$this->core=$xt;
-		$this->debug=0;
-
-		$this->dom=$xt->dom;
-		$this->root=$xt->root;
+class css2xpath{
+	public $xpath;
+	public function __construct($css, $defaultNamespace = null){
+		$this->defaultNamespace = $defaultNamespace;
 		
-		$this->method=$xt->getnode_method;
+		$this->add($css);
+		
+		return $this->xpath;
 	}
 	
-	public function get($str, $parent=0, $n=false){
-		if(!is_string($str)){
-			return array();
-		}
-		$this->parent=$parent?$parent:$this->root;
-		if($this->method===2){
-			$this->xpath='.';
-			
-			/*
-				workaround dla spacji w wartości atrybutu
-			*/
-			$str=preg_replace('#\[[^\]]+\]#e', 'str_replace(" ", "%20", "$0")', $str);
-			
-			
-			
-			$match=preg_split('#(\s*(?:>|(?<!n)\+|~(?!=))\s*|\s+)#', trim($str), -1, PREG_SPLIT_DELIM_CAPTURE);
-			array_unshift($match, null);
-			
-			if($this->debug){
-				echo '<pre>tablica ';
-				print_r($match);
-				echo '</pre>';
-			}
-			
-			$count=count($match);
-			for($i=0; $i<$count; $i+=2){
-				$str=str_replace("%20", " ", $match[$i+1]); /* dalsza część workaroundu */
-				$glue=$match[$i];
-				
-				$this->add($str, $glue);
-			}
-			
-			$objects=$this->getobjects($n);
-			
-			if($this->debug){
-			echo 'Lista<ul>';
-			foreach($objects as $object){
-				echo '<li>'.$object->nodeName.'</li>';
-			}
-			echo '</ul>';}
-			
-			return $objects;
-		}elseif($this->method===1){
-			$this->xpath=$str;
-			$objects=$this->getobjects();
-			return $objects;
-		}
+	public function __toString(){
+		return $this->xpath;
 	}
 	
-	private function add($str, $glue=0){
-		$r_name='[_a-z0-9]+';
+	/*
+		regexps
+		
+		
 		$r_id='[_a-z0-9-]+';
 		$r_hash='\#'.$r_id;
 		$r_class='\.'.$r_name;
@@ -92,197 +48,269 @@ class getNode{
 		$r_pseudo=':'.$r_id.'(?:\(.*?\))?';
 
 		$r_negation=':not\(\s*(?:'.$r_name.'|\*|'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.')\s*\)';
-		/*
-			koniec listy wyrażeń
-		*/
-		
-		if(preg_match('#^(?:([a-z]*|\*)(\|))?('.$r_name.'|\*)|\*$#i', $str, $match)){
-			/*
-				n summary:
-
-				ns|E
-				elements with name E in namespace ns
-				*|E
-				elements with name E in any namespace, including those without any declared namespace
-				|E
-				elements with name E without any declared namespace
-				E
-				if no default namespace has been specified, this is equivalent to *|E. Otherwise it is equivalent to ns|E where ns is the default namespace.
-				
-				NOTE:
-				E will be always evuivalent to *|E, because we don't set the default namespace
-			*/
-			/*
-				[1]=>namespace
-				[2]=>|
-				[3]=>nodeName
-			*/
- 
+	*/
+	
+	private $r = array(
+		'name' => '[_a-z0-9]+'
+	);
+	
+	/*
+		jeśli atrybut zamiast domyślnego ns nie daje się nic
+	*/
+	private function name_with_ns(&$str, $attribute = false){
+		if(preg_match('#^(?:([a-z]*|\*)(\|))?('.$this->r['name'].'|\*)|\*#i', $str, $match)){
+			$ns = !empty($math[1]) ? $match[1] : $ns = null;
+			
+			$str = substr($str, strlen($match[0]));
+			
 			if(!empty($match[2])){
 				if(!empty($match[1])){
 					//mamy namespace
 					if($match[1]!=='*'){
 						//ustalony namespace
-						$name=str_replace('|', ':', $match[0]); # normalnie - namespace:node_name
+						$name = str_replace('|', ':', $match[0]); # normalnie - namespace:node_name
 					}else{
 						//dowolny namespace
 						if($match[3]!=='*'){
 							// mamy nazwę
-							$this->type[]='local-name()="'.$match[3].'"';
+							$name = '*[local-name()="'.$match[3].'"]';
 						}else{
+							$name = '*';
 							// dowolny obiekt o dowolnym namespace
 						}
 					}
 				}else{
 					//elementy z domyślnym namespace
-					$name='default:'.str_replace('|', ':', $match[3]);
-					# czyli default:node_name (default to namespace deklarowany w core)
+					$name = 'default:'.str_replace('|', ':', $match[3]);
 				}
 			}else{
 				//brak namespace
-				if($this->core->xpath->defaultNamespace){
+				if($this->defaultNamespace){
 					// jest jakiś domyślny
-					$name='default:'.str_replace('|', ':', $match[3]);
+					$name = 'default:'.str_replace('|', ':', $match[3]);
 				}else{
 					if($match[3]!=='*'){
 						// mamy nazwę
-						$this->type[]='local-name()="'.$match[3].'"';
+						$name = 'local-name()="'.$match[3].'"';
 					}else{
-						// dowolny obiekt o dowolnym namespace
+						$name = '*';
 					}
 				}
 			}
 			
-			if(!isset($name)){
-				$name='*';
+			if(!$attribute){
+				return $name;
+			}else{
+				if(substr($name, 0, 8) == 'default:'){
+					return substr($name, 8);
+				}else{
+					return $name;
+				}
 			}
-			
-			$str=substr($str, strlen($match[0]));
 		}else{
-			$name='*';
+			echo 'brak name';
+			return false;
 		}
-		
-		if(!preg_match('#^(?:'.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_pseudo.'|'.$r_negation.')*$#i', $str)){
-			die('niepoprawny format <code>'.$str.'</code>');
-		}
-		preg_match_all('#('.$r_hash.'|'.$r_class.'|'.$r_attrib.'|'.$r_negation.'|'.$r_pseudo.')#i', $str, $match);
-		
-		if(empty($match[0])){
-			// nothing ?
-		}else{
-			foreach($match[0] as $param){
-				$this->addParam($param);
-			}
-		}
-		
-		$glue=$this->getglue($glue);
-		$this->xpath.=$glue.$name;
-		
-		if(!empty($this->child)){
-			$this->xpath.='/../*['.implode(' and ', $this->child).']/self::'.$name;
-		}
-		
-		if(!empty($this->type)){
-			$this->xpath.='['.implode(' and ', $this->type).']';
-		}
-		
-		unset($this->child, $this->type);
-		/*
-			jeśli $this->child
-			
-			$glue $name /../*[ $this->child ] /self:: name[ $this->type ]	
-			
-			jeśli nie
-			
-			$glue $name [ $this->type ]
-			
-			else
-			
-			$glue $name
-		*/
 	}
 	
-	private function addParam($param){
-		if($this->debug){
-			echo '<code>'.$param.'</code><br>';
+	private function t($a){
+		echo '<br>'.$a.'<br>';
+	}
+	
+	/*
+		default glue is null -> //
+	*/
+	private function add($str, $glue = null){
+		# name
+		if(!$name = $this->name_with_ns($str)){
+			$name = null;
 		}
 		
-		if(substr($param, 0, 4)==':not'){
-			$not=true;
-			$param=substr($param, 5, -1);
-		}else{
-			$not=false;
+		$str = trim($str);
+		
+		var_dump($str);
+		
+		$this->xpath .= $this->getglue($glue).$name;
+		
+		if(strlen($str)>0){
+		
+			# attributes
+			for($i=0; ; $i++){
+				echo $i;
+				
+				if(!$this->attribute($str))
+					break;
+			
+			}
+			
+			//echo $str;
+			
+			// sprawdź pierwszy znak z lewej
+			/*
+				. -> klasa
+				# -> id
+				: -> pseudo-klasa
+				[ -> atrybut
+				
+				< -> dziecko
+				-> potomek
+				+ -> brat
+				
+				, -> wszystko od początku
+			*/
+			
+			
+			
+			if(!empty($this->child)){
+				$this->xpath.='/../*['.implode(' and ', $this->child).']/self::'.$name;
+			}
+			
+			if(!empty($this->type)){
+				$this->xpath.='['.implode(' and ', $this->type).']';
+			}
+			
+			unset($this->child, $this->type);
+			
+			$str = trim($str);
+			
+			if(strlen($str)>0){
+				switch($str{0}){
+					case '+':
+					case '~':
+					case '>':
+						$this->add(trim(substr($str, 1)), $str{0});
+					break;
+					
+					case ',':
+						$this->xpath .= '|';
+						$this->add(trim(substr($str, 1)));
+					break;
+					
+					default:
+						$this->add(trim($str));
+				}
+			}
+			/*
+				jeśli $this->child
+				
+				$glue $name /../*[ $this->child ] /self:: name[ $this->type ]	
+				
+				jeśli nie
+				
+				$glue $name [ $this->type ]
+				
+				else
+				
+				$glue $name
+			*/
+		
 		}
 		
-		switch($param{0}){
+	}
+	
+	private function attribute(&$str, $not = false){
+		switch($str{0}){
 			case '#':
 				//po id
-				$this->g_id($param, $not);
+				$this->t('chyba po id');
+				return $this->g_id($str, $not);
 			break;
 			
 			case '.':
 				//klasa
-				$this->g_class($param, $not);
+				$this->t('chyba po klasie');
+				return $this->g_class($str, $not);
 			break;
 			
 			case '[':
 				//atrybut
-				$this->g_attribute($param, $not);
+				$this->t('chyba po atrybucie');
+				return $this->g_attribute($str, $not);
 			break;
 			
 			case ':':
 				//pseudo-klasa
-				$this->g_pseudoclass($param, $not);
+				$this->t('chyba po pseudo-klasie');
+				return $this->g_pseudoclass($str, $not);
 			break;
-			
 			default:
-				//nic z tych rzeczy, zatem po nazwie + not
-				if($not){
-					$this->type[]='name()!="'.$param.'"';
-				}else{
-					//nigdy nie powinno się zdarzyć
-				}
+				return null;
 			break;
 		}
 	}
 	
-	private function g_id($id, $not=false){
-		$id=substr($id, 1);
+	/*
+		odcinaj
 		
-		if(!$not){
-			$this->type[]='@id="'.$id.'"';
+		#jakiesid
+	*/
+	private function g_id(&$str, $not = false){
+		if(preg_match('#^\#('.$this->r['name'].')#', $str, $match)){
+			$id = $match[1];
+			
+			$str = substr($str, strlen($match[1])+1); // bo # dochodzi
+			
+			if(!$not){
+				$this->type[] = '@id="'.$id.'"';
+			}else{
+				$this->type[] = '@id!="'.$id.'"';
+			}
+			
+			return true;
 		}else{
-			$this->type[]='@id!="'.$id.'"';
+			return false;
 		}
 	}
 	
-	private function g_class($class, $not=false){
-		$class=substr($class, 1);
-		
-		if(!$not){
-			$this->type[]='contains(concat(" ", @class, " "), " '.$class.' ")';
+	private function g_class(&$str, $not = false){
+		if(preg_match('#^\.('.$this->r['name'].')#', $str, $match)){
+			$class = $match[1];
+			
+			$str = substr($str, strlen($match[1])+1); // plus .
+			if(!$not){
+				$this->type[]='contains(concat(" ", @class, " "), " '.$class.' ")';
+			}else{
+				$this->type[]='not(contains(concat(" ", @class, " "), " '.$class.' "))';
+			}
+			return true;
 		}else{
-			$this->type[]='not(contains(concat(" ", @class, " "), " '.$class.' "))';
+			return false;
 		}
 	}
 	
-	private function g_attribute($attribute, $not=false){
-		preg_match('#\[(.*?|\#text)(?:([~^$*|]?)="([^"]+)")?\]#i', $attribute, $match);
+	private function g_attribute(&$str, $not = false){
+		$str = substr($str, 1); // utnij [
 		
-		if($match[1]=='#text'){ // magiczny atrybut oznaczający zawartość tekstową
-			$attribute='.';
-			$separator=isset($match[2])?$match[2]:'';
-			$value=isset($match[3])?$match[3]:'';
+		// sprawdź atrybut
+		if(!$attribute = $this->name_with_ns($str, true)){
+			if(substr($str, 0, 5) !== '#text'){
+				die('błąd');
+			}else{
+				$attribute = '.';
+				$str = substr($str, 5); // utnij #text
+			}
 		}else{
-			$attribute='@'.(isset($match[1])?$match[1]:'');
-			$separator=isset($match[2])?$match[2]:'';
-			$value=isset($match[3])?$match[3]:'';
+			$attribute = '@'.$attribute; // jeśli ok - dopisz @ na początku
 		}
 		
+		$str = trim($str);
 		
-		if(!empty($value)){
+		if($str{0}==']'){
+			$match = $attribute;
+		}else{
+			$separator = $str{0};
+			
+			// FIXME: negative lookbehind
+			if(!preg_match('#^[~^$|*]?="(.*?)"]#', $str, $match)){
+				die('coś nie pasi');
+			}
+			
+			$str = substr($str, strlen($match[0]));
+			
+			$value = $match[1];
+			
 			switch($separator){
-				case '':
+				case '=':
 					$match=$attribute.'="'.$value.'"';
 					break;
 				case '~':
@@ -301,60 +329,66 @@ class getNode{
 					$match=$attribute.'="'.$value.'" or contains('.$attribute.', " '.$value.'-") or starts-with('.$attribute.', "'.$value.'-")';
 					break;
 			}
-		}else{
-			$match=$attribute;
 		}
 		
 		if(!$not){
-			$this->type[]=$match;
+			$this->type[] = $match;
 		}else{
-			$this->type[]='not('.$match.')';
+			$this->type[] = 'not('.$match.')';
 		}
+		
+		return true;
 	}
 	
-	private function g_pseudoclass($class, $not){
-		preg_match('#^(\:[a-z-]+)(?:\((.*?)\))?$#i', $class, $match);
+	private function g_pseudoclass(&$str, $not){
+		if(!preg_match('#^(\:[a-z-]+)(?:\((.*?)\))?#i', $str, $match)){
+			die('coś nie pasi');
+		}
 		
-		//print_r($match);
+		$str = substr($str, strlen($match[0]));
 		
-		$param=$match[2];
-		$match=$match[1];
+		if(isset($match[2])){
+			$param = $match[2];
+		}else{
+			// bez parametru
+		}
+		$match = $match[1];
 		
 		switch($match){
 			case ':first-child':
-				$child='position()=1';
+				$child = 'position()=1';
 			break;
 			
 			case ':last-child':
-				$child='position()=last()';
+				$child = 'position()=last()';
 			break;
 			
 			case ':first-of-type':
-				$type='position()=1';
+				$type = 'position()=1';
 			break;
 			
 			case ':last-of-type':
-				$type='position()=last()';
+				$type = 'position()=last()';
 			break;
 			
 			case ':only-of-type':
-				$type='position()=1 and position()=last()';
+				$type = 'position()=1 and position()=last()';
 			break;
 			
 			case ':only-child':
-				$child='position()=1 and position()=last()';
+				$child = 'position()=1 and position()=last()';
 			break;
 			
 			case ':root':
-				$type='/=.';
+				$type = '/=.';
 			break;
 			
 			case ':empty':
-				$type='count(./child::node())=0';
+				$type = 'count(./child::node())=0';
 			break;
 			
 			case ':lang':
-				$type='(@lang="'.$param.'" or contains(@lang, " '.$param.'-") or starts-with(@lang, "'.$param.'-"))';
+				$type = '(@lang="'.$param.'" or contains(@lang, " '.$param.'-") or starts-with(@lang, "'.$param.'-"))';
 			break;
 			case ':nth-child':
 			case ':nth-last-child':
@@ -410,6 +444,10 @@ class getNode{
 				}
 			break;
 			
+			case ':not':
+				$this->attribute($param, true);
+			break;
+			
 			default:
 				# ERROR;
 				# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -442,7 +480,7 @@ class getNode{
 			
 			$results = $this->core->xpath->query($this->xpath, $this->parent);
 			
-			if($this->debug){
+			if($this->debug||1){
 				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';
 			}
 			
@@ -462,7 +500,7 @@ class getNode{
 					$glue='/descendant::';
 					break;
 				case '>':
-					$glue='/';
+					$glue='/child::';
 					break;
 				case '+':
 					$glue='/following::*[1]/self::';
