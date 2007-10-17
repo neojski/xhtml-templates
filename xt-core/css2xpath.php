@@ -29,7 +29,7 @@ class css2xpath{
 		
 		$this->add(trim($css));
 		
-		//echo $this->xpath.'<br>';
+		//echo 'Zapytanie to <pre>'.trim($this->xpath).'</pre><br>';
 		
 		return $this->xpath;
 	}
@@ -134,8 +134,11 @@ class css2xpath{
 			for($i=0; ; $i++){
 				//echo $i;
 				
-				if(!$this->attribute($str))
+				if($condition = $this->attribute($str)){
+					$this->type[] = $condition;
+				}else{
 					break;
+				}
 			
 			}
 
@@ -168,30 +171,30 @@ class css2xpath{
 		
 	}
 	
-	private function attribute(&$str, $not = false){
+	private function attribute(&$str){
 		switch($str{0}){
 			case '#':
 				//po id
 				$this->t('chyba po id');
-				return $this->g_id($str, $not);
+				return $this->g_id($str);
 			break;
 			
 			case '.':
 				//klasa
 				$this->t('chyba po klasie');
-				return $this->g_class($str, $not);
+				return $this->g_class($str);
 			break;
 			
 			case '[':
 				//atrybut
 				$this->t('chyba po atrybucie');
-				return $this->g_attribute($str, $not);
+				return $this->g_attribute($str);
 			break;
 			
 			case ':':
 				//pseudo-klasa
 				$this->t('chyba po pseudo-klasie');
-				return $this->g_pseudoclass($str, $not);
+				return $this->g_pseudoclass($str);
 			break;
 			default:
 				return null;
@@ -204,41 +207,31 @@ class css2xpath{
 		
 		#jakiesid
 	*/
-	private function g_id(&$str, $not = false){
+	private function g_id(&$str){
 		if(preg_match('#^\#('.$this->r['name'].')#i', $str, $match)){
 			$id = $match[1];
 			
 			$str = substr($str, strlen($match[1])+1); // bo # dochodzi
 			
-			if(!$not){
-				$this->type[] = '@id="'.$id.'"';
-			}else{
-				$this->type[] = '@id!="'.$id.'"';
-			}
-			
-			return true;
+			return '@id="'.$id.'"';
 		}else{
 			return false;
 		}
 	}
 	
-	private function g_class(&$str, $not = false){
+	private function g_class(&$str){
 		if(preg_match('#^\.('.$this->r['name'].')#i', $str, $match)){
 			$class = $match[1];
 			
 			$str = substr($str, strlen($match[1])+1); // plus .
-			if(!$not){
-				$this->type[]='contains(concat(" ", @class, " "), " '.$class.' ")';
-			}else{
-				$this->type[]='not(contains(concat(" ", @class, " "), " '.$class.' "))';
-			}
-			return true;
+			
+			return 'contains(concat(" ", @class, " "), " '.$class.' ")';
 		}else{
 			return false;
 		}
 	}
 	
-	private function g_attribute(&$str, $not = false){
+	private function g_attribute(&$str){
 		$str = substr($str, 1); // utnij [
 		
 		// sprawdź atrybut
@@ -301,16 +294,10 @@ class css2xpath{
 			}
 		}
 		
-		if(!$not){
-			$this->type[] = $match;
-		}else{
-			$this->type[] = 'not('.$match.')';
-		}
-		
-		return true;
+		return $match;
 	}
 	
-	private function g_pseudoclass(&$str, $not){
+	private function g_pseudoclass(&$str){
 		if(!preg_match('#^(\:[a-z-]+)(?:\((.*?)\))?#i', $str, $match)){
 			die('coś nie pasi');
 		}
@@ -322,15 +309,14 @@ class css2xpath{
 		}else{
 			// bez parametru
 		}
-		$match = $match[1];
 		
-		switch($match){
+		switch($match[1]){
 			case ':first-child':
 				$type = './parent::* and count(preceding-sibling::*)=0';
 			break;
 			
 			case ':last-child':
-				$type = './parent::* and count(folowing-sibling::*)=0';
+				$type = './parent::* and count(following-sibling::*)=0';
 			break;
 			
 			case ':only-child':
@@ -348,7 +334,7 @@ class css2xpath{
 				if(!isset($this->name)){
 					die(':...-of-type needs node-name');
 				}
-				$type = './parent::* and count(folowing::'.$this->name.')=0';
+				$type = './parent::* and count(following::'.$this->name.')=0';
 			break;
 			
 			case ':only-of-type':
@@ -370,21 +356,6 @@ class css2xpath{
 			case ':nth-last-child':
 			case ':nth-of-type':
 			case ':nth-last-of-type':
-				if(strpos($match, 'last')!==false){
-					$dir = 'folowing';
-				}else{
-					$dir = 'preceding';
-				}
-				
-				if(strpos($match, 'of-type')!==false){
-					if(!isset($this->name)){
-						die(':...-of-type needs node-name');
-					}
-					$sibling = '::'.$this->name;
-				}else{
-					$sibling = '-sibling::*';
-				}
-				
 				if($param == 'even'){
 					$a=2;
 					$b=2;
@@ -411,23 +382,46 @@ class css2xpath{
 						$b=(int)$b[1];
 					}
 				}
+				
+				if(strpos($match[1], 'last')!==false){
+					$dir = 'following'; // last
+					//$b;
+				}else{
+					$dir = 'preceding'; // normalnie
+				}
+				
+				if(strpos($match[1], 'of-type')!==false){
+					if(!isset($this->name)){
+						die(':...-of-type needs node-name');
+					}
+					$sibling = '::'.$this->name;
+				}else{
+					$sibling = '-sibling::*';
+				}
 
 				if($a==1){
-					$type = 'count('.$dir.$sibling.')>'.($b);
+					$type = 'count('.$dir.$sibling.')>='.($b-1); // ok
 				}elseif($a==-1){
-					$type = 'count('.$dir.$sibling.')<'.($b);
-				}elseif($a){
-					$type = 'count('.$dir.$sibling.') mod '.$a.'='.($b-1);
+					$type = 'count('.$dir.$sibling.')<='.($b-1); // ok
+				}elseif($a > 0){
+					$type = '(count('.$dir.$sibling.')) mod '.$a.'='.(($b-1)%$a).' and (count('.$dir.$sibling.')) >= '.($b-1);
+				}elseif($a < 0){
+					$type = '(count('.$dir.$sibling.')) mod '.abs($a).'='.(($b-1)%$a).' and (count('.$dir.$sibling.')) <= '.($b-1);
 				}else{
-					$type = 'count('.$dir.$sibling.')='.$b;
+					$type = 'count('.$dir.$sibling.')='.($b-1); // ok
 				}
 				
 				$type = './parent::* and '.$type;
 			break;
 			
 			case ':not':
-				// FIXME - problems with (), i.e. :not(:lang(fr))
-				$this->attribute($param, true);
+				$tmp = substr($match[0].$str, 5); // doklej spowrotem :not(xxx)... i wytnij sam środek - xxx)...
+				
+				$return =  $this->attribute($tmp); // odetnij wszystko z wnętrza, czyli xxx)...
+				
+				$str = substr($tmp, 1); // odetnij kończący nawias )
+				
+				return 'not('.$return.')';
 			break;
 			
 			default:
@@ -435,15 +429,7 @@ class css2xpath{
 			break;
 		}
 		
-		if(isset($type) && strlen($type)>0){
-			if(!$not){
-				$this->type[]=$type;
-			}else{
-				$this->type[]='not('.$type.')';
-			}
-		}
-		
-		return true;
+		return $type;
 	}
 	
 	private function getglue($glue){
