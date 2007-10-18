@@ -46,7 +46,7 @@ class css2xpath{
 		jeśli atrybut zamiast domyślnego ns nie daje się nic
 	*/
 	private function name_with_ns(&$str, $attribute = false){
-		if(preg_match('#^(?:([a-z]*|\*)(\|))?('.$this->r['name'].'|\*)|\*#i', $str, $match)){
+		if(preg_match('#^(?:(?:([a-z]*|\*)(\|))?('.$this->r['name'].'|\*)|\*)#i', $str, $match)){
 			$ns = !empty($math[1]) ? $match[1] : $ns = null;
 			
 			$str = substr($str, strlen($match[0]));
@@ -73,14 +73,14 @@ class css2xpath{
 				}
 			}else{
 				//brak namespace
-				if($this->defaultNamespace && $match[3]!=='*'){
+				if($this->defaultNamespace && isset($match[3]) && $match[3]!=='*'){
 					// jest jakiś domyślny
 					$name = '*[local-name()="'.$match[3].'"]';
 					/*
 						jeśli jest domyślny namespace, to wtedy obiekt dowolnego ns ma jakiś domyślny namespace
 					*/
 				}else{
-					if($match[3]!=='*'){
+					if(isset($match[3]) && $match[3]!=='*'){
 						// mamy nazwę
 						$name = '*[local-name()="'.$match[3].'"]';
 					}else{
@@ -299,7 +299,7 @@ class css2xpath{
 	
 	private function g_pseudoclass(&$str){
 		if(!preg_match('#^(\:[a-z-]+)(?:\((.*?)\))?#i', $str, $match)){
-			die('coś nie pasi');
+			die('coś nie pasi psuedo1');
 		}
 		
 		$str = substr($str, strlen($match[0]));
@@ -338,6 +338,9 @@ class css2xpath{
 			break;
 			
 			case ':only-of-type':
+				if(!isset($this->name)){
+					die(':...-of-type needs node-name');
+				}
 				$type = './parent::* and count(../'.$this->name.')=0';
 			break;
 			
@@ -394,9 +397,9 @@ class css2xpath{
 					if(!isset($this->name)){
 						die(':...-of-type needs node-name');
 					}
-					$sibling = '::'.$this->name;
+					$sibling = '::'.$this->name; // type
 				}else{
-					$sibling = '-sibling::*';
+					$sibling = '-sibling::*'; // child
 				}
 
 				if($a==1){
@@ -417,7 +420,14 @@ class css2xpath{
 			case ':not':
 				$tmp = substr($match[0].$str, 5); // doklej spowrotem :not(xxx)... i wytnij sam środek - xxx)...
 				
-				$return =  $this->attribute($tmp); // odetnij wszystko z wnętrza, czyli xxx)...
+				if($name = $this->name_with_ns($tmp)){
+					$return = $name;
+				}else{
+					$return = '';
+				}
+				
+				
+				$return .=  $this->attribute($tmp); // odetnij wszystko z wnętrza, czyli xxx)...
 				
 				$str = substr($tmp, 1); // odetnij kończący nawias )
 				
@@ -425,7 +435,7 @@ class css2xpath{
 			break;
 			
 			default:
-				die('coś nie pasi');
+				die('coś nie pasi pseudo');
 			break;
 		}
 		

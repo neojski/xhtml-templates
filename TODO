@@ -1,3 +1,6 @@
-*	dodać ostrzeżenie jeśli szablon został wyświetlony, a ktoś chce coś z nim robić
-*	być może coś jak w call_user_funct - array($rodzic, $referencja), czyli array(DOMElement, 'li > a'), będzie oznaczać wszystkie li>a wewnątrz danego elementu
-*	wywalicz wszystkie ułatwiacze "DOMowe" do klasy xml
+// of-child
+	current, slower with * selector, faster with name
+	$query -> xpath = '/descendant-or-self::default:body/descendant::name[count(preceding-sibling::*)=(1-1)]';
+
+	faster with *, slower with name
+	$query -> xpath = '/descendant-or-self::default:body/descendant::name/../name[position()=1]';

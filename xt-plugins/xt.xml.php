@@ -202,7 +202,7 @@ class xml{
 			if(!$parent){
 				$parent=$this->core->root;
 			}
-			return $this->core->xpath->query($query, $parent);
+			return $this->core->xpath->query('.'.$query, $parent);
 		}
 	}
 	
@@ -284,18 +284,18 @@ class xml{
 			
 			
 			// wykonaj wszystkie zebrane te
-			foreach($xt_loop->f as $a => $array){
-				/**
-					FIXME
-					zadziałają tylko funkcje, gdzie pierwszwym parametrem jest obiekt node (względnie tekstowe odwołanie)
-				*/
+			foreach($xt_loop->f as $array){
+				#FIXME
+				#	zadziałają tylko funkcje, gdzie pierwszwym parametrem jest obiekt node (względnie tekstowe odwołanie)
 				
-				$array[1][0] = $this->getOneNode($array[1][0] , $clone);
+				$array[1][0] = $this->getOneNode($array[1][0], $clone);
 			
 				call_user_func_array(array('xml', $array[0]), $array[1]);
+				
+				
 			}
 			
-			$node->parentNode->insertBefore($clone);
+			$node->parentNode->insertBefore($clone, $node);
 		}
 		
 		$this->remove($node);
