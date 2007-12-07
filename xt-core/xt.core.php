@@ -84,7 +84,7 @@ class xt{
 	 */
 	public function __call($name, $arguments){
 		if(!method_exists($this, $name)){
-			 throw new xtException('Metoda '.$name.' nie istnieje!');
+			 //throw new xtException('Metoda '.$name.' nie istnieje!');
 		}
 	}
 	
@@ -245,6 +245,10 @@ class xt{
 		/************* xpath tests *****************/
 		
 		// excecute display functions
+		/*
+			display function for fragment are in xt.xml.php (look for ".php")
+		*/
+		
 		if(file_exists($this->name.'.php')){
 			require_once($this->name.'.php');
 		}

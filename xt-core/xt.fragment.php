@@ -23,6 +23,10 @@ class fragment extends xt{
 		$this->parent=$xt->dom;
 		parent::__construct();//should be removed?
 	}
+	
+	/*
+		powinien być kompatybilny z load z xt.core.php	
+	*/
 	public function load($file, $is_string=false){
 		if(!$is_string){
 			if(file_exists($file)){
@@ -41,6 +45,9 @@ class fragment extends xt{
 		$this->root=$xpath->query('.', $this->s)->item(0);
 		
 		$this->dom=$this->parent;
+		
+		$this->name=$file;
+		$this->xpath=new DOMXPath($this->dom);
 	}
 	public function getElementsByTagName($tag, $parent=0){
 		if(!$parent){
@@ -49,6 +56,12 @@ class fragment extends xt{
 		$xpath = new DOMXPath($this->dom);
 		$query = './descendant::'.$tag;
 		return $xpath->query($query, $parent);
+	}
+	
+	public function execute_display(){
+		if(file_exists($this->name.'.php')){
+			require_once($this->name.'.php');
+		}
 	}
 	
 	/**

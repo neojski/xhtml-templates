@@ -163,9 +163,12 @@ class xml{
 			$fragment=$this->core->dom->createDocumentFragment();
 			$fragment->appendXML('<root '.$this->core->namespaces.'>'.$str.'</root>');
 			
-			foreach($fragment->firstChild->childNodes as $child){
+			// pętla od końca, bo drzwo modyfikowane jest na żywo!
+			for($i=$fragment->firstChild->childNodes->length-1; $i>=0; $i--){
+				$child = $fragment->firstChild->childNodes->item($i);
 				$fragment->appendChild($child);
 			}
+			
 			$fragment->removeChild($fragment->firstChild);
 			
 			return $fragment;
@@ -202,6 +205,7 @@ class xml{
 			if(!$parent){
 				$parent=$this->core->root;
 			}
+			
 			return $this->core->xpath->query('.'.$query, $parent);
 		}
 	}
@@ -261,6 +265,10 @@ class xml{
 			}elseif($this->is_node($value)){
 				return $node->appendChild($value);
 			}elseif($value instanceof fragment){
+				
+				
+				$value->execute_display();
+				
 				return $node->appendChild($value->s);
 			}elseif($value[0] instanceof xt_loop){
 				$this->loop_xt($node, $value);

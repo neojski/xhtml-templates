@@ -38,8 +38,8 @@ class js{
 	}
 	
 	public function file($url){
-		$link=$this->core->create('script', null, array('type'=>'text/javascript', 'src'=>$url));
-		$this->core->head->appendChild($link);
+		$link=$this->core->xml->create('script', null, array('type'=>'text/javascript', 'src'=>$url));
+		$this->core->root->getElementsByTagName('head')->item(0)->appendChild($link);
 	}
 }
 ?>

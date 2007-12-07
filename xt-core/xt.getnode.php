@@ -470,26 +470,6 @@ class css2xpath{
 		}
 	}
 	
-	private function getobjects($count=false){
-		if(empty($this->xpath)){
-			return null;
-		}else{
-			if(is_int($count)){
-				//$this->xpath.='[position()='.$count.']';
-			}
-			
-			$results = $this->core->xpath->query($this->xpath, $this->parent);
-			
-			if($this->debug||1){
-				echo '<p>Zapytanie to: <code>'.$this->xpath.'</code></p>';
-			}
-			
-			#print_r($results->item(1));
-			
-			return $results;
-		}
-	}
-	
 	private function getglue($glue){
 		if(is_null($glue)){
 			return '/descendant-or-self::';
