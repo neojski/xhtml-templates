@@ -163,13 +163,16 @@ class xml{
 			$fragment=$this->core->dom->createDocumentFragment();
 			$fragment->appendXML('<root '.$this->core->namespaces.'>'.$str.'</root>');
 			
+			$root = $fragment->firstChild;
+			
 			// pętla od końca, bo drzwo modyfikowane jest na żywo!
-			for($i=$fragment->firstChild->childNodes->length-1; $i>=0; $i--){
-				$child = $fragment->firstChild->childNodes->item($i);
-				$fragment->appendChild($child);
+			for($i=$root->childNodes->length-1; $i>=0; $i--){
+				$child = $root->childNodes->item($i);
+				
+				$fragment->insertBefore($child, $fragment->firstChild);
 			}
 			
-			$fragment->removeChild($fragment->firstChild);
+			$fragment->removeChild($root);
 			
 			return $fragment;
 		}elseif($str instanceof fragment){
@@ -206,7 +209,7 @@ class xml{
 				$parent=$this->core->root;
 			}
 			
-			return $this->core->xpath->query('.'.$query, $parent);
+			return $this->core->xpath->query('.'.$query->xpath, $parent);
 		}
 	}
 	
