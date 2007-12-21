@@ -71,11 +71,26 @@ class form{
 		foreach($this->core->xml->getnode($css.'[method="post"] select[name]') as $select){
 			$name=$select->getAttribute('name');
 			if(isset($_POST[$name])){
-				if($option=$this->core->getOneNode($css.'[method="post"] select[name="'.$name.'"] option[value="'.$_POST[$name].'"]')){
+				if($option=$this->core->xml->getOneNode($css.'[method="post"] select[name="'.$name.'"] option[value="'.$_POST[$name].'"]')){
 					$option->setAttribute('selected', 'selected');
 				}
 			}
 		}
+		
+		/* pole multiple select, kończący się na [] */
+		foreach($this->core->xml->getnode($css.'[method="post"] select[name$="[]"][multiple="multiple"]') as $select){
+			$name = substr($select->getAttribute('name'), 0, -2);
+				
+			if(isset($_POST[$name])){
+				foreach($_POST[$name] as $option_value){
+					if($option = $this->core->xml->getOneNode($css.'[method="post"] select[name="'.$name.'[]"] option[value="'.$option_value.'"]')){
+						
+						$option->setAttribute('selected', 'selected');
+					}
+				}
+			}
+		}
+		
 		
 		/* to samo, tylko get */
 		/* sprawdź wszystkie inputy */
@@ -100,6 +115,20 @@ class form{
 			if(isset($_GET[$name])){
 				if($option=$this->core->getOneNode($css.'[method="get"] select[name="'.$name.'"] option[value="'.$_GET[$name].'"]')){
 					$option->setAttribute('selected', 'selected');
+				}
+			}
+		}
+		
+		/* pole multiple select, kończący się na [] */
+		foreach($this->core->xml->getnode($css.'[method="get"] select[name$="[]"][multiple="multiple"]') as $select){
+			$name = substr($select->getAttribute('name'), 0, -2);
+				
+			if(isset($_GET[$name])){
+				foreach($_GET[$name] as $option_value){
+					if($option = $this->core->xml->getOneNode($css.'[method="post"] select[name="'.$name.'[]"] option[value="'.$option_value.'"]')){
+						
+						$option->setAttribute('selected', 'selected');
+					}
 				}
 			}
 		}

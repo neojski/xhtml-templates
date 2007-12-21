@@ -290,6 +290,8 @@ class xt{
 				}
 				echo preg_replace('#<\?xml[^?]+\?>#s', '', $this->output, 1);
 			}
+		}elseif($mime == 3){
+			echo str_replace(array('<![CDATA[', ']]>'), array('', ''), $this->output);
 		}else{
 			if(!headers_sent()){
 				header('Content-Type: '.$mime_tab[$mime].'; charset='.$this->encoding);
