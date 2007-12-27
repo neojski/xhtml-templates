@@ -296,7 +296,7 @@ class xt{
 				if(!headers_sent()){
 					header('Content-Type: text/html; charset='.$this->encoding);
 				}
-				echo preg_replace('#<\?xml[^?]+\?>#s', '', $this->output, 1);
+				echo preg_replace('#<\?xml[^?]+\?>#s', '', str_replace(array('<![CDATA[', ']]>'), array('', ''), $this->output));
 			}
 		}elseif($mime == 3){
 			echo preg_replace('#<\?xml[^?]+\?>#s', '', str_replace(array('<![CDATA[', ']]>'), array('', ''), $this->output));
