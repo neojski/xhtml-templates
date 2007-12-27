@@ -161,6 +161,9 @@ class xml{
 			return $str;
 		}elseif(is_string($str)){
 			$fragment=$this->core->dom->createDocumentFragment();
+			
+			$str = $this->core->entities($str);
+			
 			$fragment->appendXML('<root '.$this->core->namespaces.'>'.$str.'</root>');
 			
 			$root = $fragment->firstChild;

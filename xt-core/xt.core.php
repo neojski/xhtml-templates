@@ -39,6 +39,12 @@ class xt{
 	 * constuction method
 	 */
 	public function __construct($file=0, $is_string=0){
+		// entities, pobiera referencje
+		require_once('entities-ref/entities.php');
+		$this->entities_from = $entities_from;
+		$this->entities_to = $entities_to;
+		// koniec
+	
 		$this->dir = dirname(__FILE__);
 		$this->find_plugins();
 		$this->getnode_method = 2;
@@ -122,10 +128,12 @@ class xt{
 		FIXME:
 		remove global functions
 	*/
-	public function entities(){
-		global $entities_from;
-		global $entities_to;
-		$this->template=str_replace($entities_from, $entities_to, $this->template);
+	public function entities($str=null){
+		if($str){
+			return str_replace($this->entities_from, $this->entities_to, $str);
+		}else{
+			$this->template=str_replace($this->entities_from, $this->entities_to, $this->template);
+		}
 	}
 	
 	/**
