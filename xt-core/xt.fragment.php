@@ -38,6 +38,8 @@ class fragment extends xt{
 			$this->template=$file;
 		}
 		
+		$this->entities();
+		
 		$this->s=$this->parent->createDocumentFragment(); //tej durnej nazwy używa add() ;-)
 		$this->s->appendXML($this->template);
 		

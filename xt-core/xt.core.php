@@ -122,7 +122,7 @@ class xt{
 		FIXME:
 		remove global functions
 	*/
-	private function entities(){
+	public function entities(){
 		global $entities_from;
 		global $entities_to;
 		$this->template=str_replace($entities_from, $entities_to, $this->template);
@@ -291,7 +291,7 @@ class xt{
 				echo preg_replace('#<\?xml[^?]+\?>#s', '', $this->output, 1);
 			}
 		}elseif($mime == 3){
-			echo str_replace(array('<![CDATA[', ']]>'), array('', ''), $this->output);
+			echo preg_replace('#<\?xml[^?]+\?>#s', '', str_replace(array('<![CDATA[', ']]>'), array('', ''), $this->output));
 		}else{
 			if(!headers_sent()){
 				header('Content-Type: '.$mime_tab[$mime].'; charset='.$this->encoding);
