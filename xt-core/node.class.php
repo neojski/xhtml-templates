@@ -56,7 +56,7 @@ class node{
 	}
 	
 	/*
-		read as ,,insertBeforeMe''
+		read as insertBeforeMe
 	*/
 	public function insertBefore($new_node){
 		$this->core->xml->insertBefore($this->node, $new_node);

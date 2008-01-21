@@ -97,9 +97,10 @@ class xt{
 	/**
 	 * @param str filename/template
 	 */
-	public $name; // nazwa szablonu
-	public $dom; // obiekt xml szablonu
-	public $template; // zawartość szablonu
+	public $name;		// nazwa szablonu
+	public $dom;		// obiekt xml szablonu
+	public $template;	// zawartość szablonu
+	public $root;		// głowny element
 	public function load($file, $is_string=false){
 		if(!$is_string){
 			if(file_exists($file)){
@@ -124,10 +125,6 @@ class xt{
 		$this->check_namespaces();
 	}
 	
-	/**
-		FIXME:
-		remove global functions
-	*/
 	public function entities($str=null){
 		if($str){
 			return str_replace($this->entities_from, $this->entities_to, $str);
