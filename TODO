@@ -4,3 +4,5 @@
 
 	faster with *, slower with name
 	$query -> xpath = '/descendant-or-self::default:body/descendant::name/../name[position()=1]';
+	
+*	fix problem with entities in fragment (require_once the file with entities causes that entities aren't loaded with the fragment class)
